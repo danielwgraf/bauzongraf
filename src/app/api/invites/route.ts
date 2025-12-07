@@ -38,6 +38,14 @@ const EXPECTED_INVITES: InviteParty[] = [
     ],
   },
   // Add more parties here
+  {
+    id: '3',
+    lastName: 'Doe',
+    members: [
+      { id: '3-1', firstName: 'John', lastName: 'Doe' },
+      { id: '3-2', firstName: 'Jane', lastName: 'Doe' },
+    ],
+  },
 ];
 
 export async function POST(request: Request) {
