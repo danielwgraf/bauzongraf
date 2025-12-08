@@ -87,7 +87,7 @@ export async function POST(request: Request) {
       if (hasChanges) {
         const { data: updatedData, error: updateError } = await supabase
           .from('rsvps')
-          .update(newRsvpData)
+          .update({ ...newRsvpData, updated_at: new Date().toISOString() })
           .eq('id', existingRsvp.id)
           .select()
           .single();

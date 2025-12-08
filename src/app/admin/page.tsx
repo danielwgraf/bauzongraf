@@ -18,13 +18,29 @@ interface RSVP {
   is_attending: boolean;
   dietary_restrictions?: string | null;
   created_at: string;
+  updated_at?: string | null;
   // Legacy fields
   name?: string;
+}
+
+interface HistoryEntry {
+  id: string;
+  rsvp_id: string;
+  party_id: string;
+  member_id: string;
+  member_name: string;
+  is_attending: boolean;
+  dietary_restrictions: string | null;
+  action: string;
+  changed_at: string;
+  previous_values: any;
 }
 
 function RSVPList() {
   const [rsvps, setRsvps] = useState<RSVP[]>([]);
   const [loading, setLoading] = useState(true);
+  const [expandedHistory, setExpandedHistory] = useState<Record<string, boolean>>({});
+  const [historyData, setHistoryData] = useState<Record<string, HistoryEntry[]>>({});
 
   useEffect(() => {
     const fetchRsvps = async () => {
@@ -95,9 +111,14 @@ function RSVPList() {
                   email: rsvp.email,
                   members: [],
                   created_at: rsvp.created_at,
+                  updated_at: rsvp.updated_at || null,
                 };
               }
               acc[key].members.push(rsvp);
+              // Track the most recent updated_at across all members
+              if (rsvp.updated_at && (!acc[key].updated_at || new Date(rsvp.updated_at) > new Date(acc[key].updated_at))) {
+                acc[key].updated_at = rsvp.updated_at;
+              }
             } else {
               // Old format - treat as individual RSVP
               const key = `individual-${rsvp.id}`;
@@ -107,22 +128,110 @@ function RSVPList() {
                 email: rsvp.email,
                 members: [rsvp],
                 created_at: rsvp.created_at,
+                updated_at: rsvp.updated_at || null,
               };
             }
             return acc;
-          }, {} as Record<string, { partyId: string | null; lastName: string; email: string; members: RSVP[]; created_at: string }>);
+          }, {} as Record<string, { partyId: string | null; lastName: string; email: string; members: RSVP[]; created_at: string; updated_at: string | null }>);
 
-          return Object.values(parties).map((party, idx) => (
-            <div key={party.partyId || `party-${idx}`} className="border rounded-lg p-4 shadow-md bg-white">
+          return Object.values(parties).map((party, idx) => {
+            const partyKey = party.partyId || `party-${idx}`;
+            const isHistoryExpanded = expandedHistory[partyKey] || false;
+            
+            const fetchHistory = async () => {
+              if (historyData[partyKey]) return; // Already loaded
+              
+              try {
+                const response = await fetch(`/api/rsvps/history?party_id=${party.partyId || ''}`);
+                const result = await response.json();
+                if (result.data) {
+                  setHistoryData(prev => ({
+                    ...prev,
+                    [partyKey]: result.data,
+                  }));
+                }
+              } catch (error) {
+                console.error('Error fetching history:', error);
+              }
+            };
+
+            const toggleHistory = () => {
+              if (!isHistoryExpanded) {
+                fetchHistory();
+              }
+              setExpandedHistory(prev => ({
+                ...prev,
+                [partyKey]: !prev[partyKey],
+              }));
+            };
+
+            return (
+            <div key={partyKey} className="border rounded-lg p-4 shadow-md bg-white">
               <div className="mb-3 pb-3 border-b">
-                <p className="font-bold text-xl">
-                  {party.lastName} {party.partyId ? 'Party' : ''}
-                </p>
-                <p className="text-gray-600 text-sm">{party.email}</p>
-                <p className="text-xs text-gray-400 mt-1">
-                  {new Date(party.created_at).toLocaleString()}
-                </p>
+                <div className="flex justify-between items-start">
+                  <div>
+                    <p className="font-bold text-xl">
+                      {party.lastName} {party.partyId ? 'Party' : ''}
+                    </p>
+                    <p className="text-gray-600 text-sm">{party.email}</p>
+                    <div className="mt-2 space-y-1">
+                      <p className="text-xs text-gray-400">
+                        Created: {new Date(party.created_at).toLocaleString()}
+                      </p>
+                      {party.updated_at && (
+                        <p className="text-xs text-blue-600 font-medium">
+                          Updated: {new Date(party.updated_at).toLocaleString()}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                  {party.partyId && (
+                    <button
+                      onClick={toggleHistory}
+                      className="text-sm text-blue-600 hover:text-blue-800 underline"
+                    >
+                      {isHistoryExpanded ? 'Hide' : 'View'} History
+                    </button>
+                  )}
+                </div>
               </div>
+              {isHistoryExpanded && historyData[partyKey] && (
+                <div className="mb-4 p-3 bg-gray-50 rounded-lg border border-gray-200">
+                  <h4 className="font-semibold text-sm mb-2 text-gray-700">Change History</h4>
+                  <div className="space-y-2 max-h-64 overflow-y-auto">
+                    {historyData[partyKey].length > 0 ? (
+                      historyData[partyKey].map((entry) => (
+                        <div key={entry.id} className="text-xs border-l-2 border-gray-300 pl-2">
+                          <div className="flex justify-between items-start">
+                            <div>
+                              <p className="font-medium">{entry.member_name}</p>
+                              <p className="text-gray-600">
+                                {entry.action === 'created' ? 'Created' : 'Updated'} on{' '}
+                                {new Date(entry.changed_at).toLocaleString()}
+                              </p>
+                              {entry.previous_values && (
+                                <div className="mt-1 text-gray-500">
+                                  <p>Previous: {entry.previous_values.is_attending ? 'Attending' : 'Not Attending'}</p>
+                                  {entry.previous_values.dietary_restrictions && (
+                                    <p>Dietary: {entry.previous_values.dietary_restrictions}</p>
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                            <span className={`text-xs px-2 py-1 rounded ${
+                              entry.is_attending ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                            }`}>
+                              {entry.is_attending ? 'Attending' : 'Not Attending'}
+                            </span>
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <p className="text-xs text-gray-500">No history available</p>
+                    )}
+                  </div>
+                </div>
+              )}
               <div className="space-y-3">
                 {party.members.map((member) => (
                   <div key={member.member_id || member.id} className="pl-4 border-l-2 border-gray-200">
@@ -141,7 +250,8 @@ function RSVPList() {
                 ))}
               </div>
             </div>
-          ));
+            );
+          });
         })()
       ) : (
         <div className="text-center py-10">
