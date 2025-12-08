@@ -36,40 +36,104 @@ interface HistoryEntry {
   previous_values: any;
 }
 
+interface PartyMember {
+  id: string;
+  first_name: string;
+  last_name: string;
+}
+
+interface Party {
+  id: string;
+  last_name: string;
+  created_at: string;
+  party_members: PartyMember[];
+}
+
+interface PartyWithStatus extends Party {
+  rsvps: RSVP[];
+  hasResponded: boolean;
+  allMembersResponded: boolean;
+  attendingCount: number;
+  totalMembers: number;
+  email?: string;
+  lastUpdated?: string;
+}
+
 function RSVPList() {
+  const [parties, setParties] = useState<PartyWithStatus[]>([]);
   const [rsvps, setRsvps] = useState<RSVP[]>([]);
   const [loading, setLoading] = useState(true);
   const [expandedHistory, setExpandedHistory] = useState<Record<string, boolean>>({});
   const [historyData, setHistoryData] = useState<Record<string, HistoryEntry[]>>({});
 
   useEffect(() => {
-    const fetchRsvps = async () => {
+    const fetchData = async () => {
       try {
-        const res = await fetch('/api/rsvps');
-        const result = await res.json();
-        console.log('RSVP fetch response:', result);
-        
-        if (res.ok) {
-          if (result.error) {
-            console.error('API returned error:', result.error);
-            setRsvps([]);
-          } else {
-            console.log('Setting RSVPs:', result.data);
-            setRsvps(result.data || []);
+        // Fetch all parties and all RSVPs in parallel
+        const [partiesRes, rsvpsRes] = await Promise.all([
+          fetch('/api/parties'),
+          fetch('/api/rsvps'),
+        ]);
+
+        const partiesResult = await partiesRes.json();
+        const rsvpsResult = await rsvpsRes.json();
+
+        if (partiesRes.ok && partiesResult.data) {
+          const partiesData: Party[] = partiesResult.data;
+          
+          if (rsvpsRes.ok && rsvpsResult.data) {
+            setRsvps(rsvpsResult.data || []);
           }
+
+          // Match RSVPs to parties
+          const partiesWithStatus: PartyWithStatus[] = partiesData.map((party) => {
+            const partyRsvps = (rsvpsResult.data || []).filter(
+              (rsvp: RSVP) => rsvp.party_id === party.id
+            );
+
+            const memberIds = new Set(party.party_members.map(m => m.id));
+            const respondedMemberIds = new Set(partyRsvps.map((r: RSVP) => r.member_id));
+            const attendingCount = partyRsvps.filter((r: RSVP) => r.is_attending).length;
+
+            const hasResponded = partyRsvps.length > 0;
+            const allMembersResponded = party.party_members.length > 0 && 
+              party.party_members.every(m => respondedMemberIds.has(m.id));
+
+            // Get the most recent update time
+            const lastUpdated = partyRsvps.length > 0
+              ? partyRsvps.reduce((latest: string | null, rsvp: RSVP) => {
+                  if (!latest) return rsvp.updated_at || rsvp.created_at;
+                  if (!rsvp.updated_at) return latest;
+                  return new Date(rsvp.updated_at) > new Date(latest) 
+                    ? rsvp.updated_at 
+                    : latest;
+                }, null)
+              : undefined;
+
+            return {
+              ...party,
+              rsvps: partyRsvps,
+              hasResponded,
+              allMembersResponded,
+              attendingCount,
+              totalMembers: party.party_members.length,
+              email: partyRsvps[0]?.email,
+              lastUpdated,
+            };
+          });
+
+          setParties(partiesWithStatus);
         } else {
-          console.error('Failed to fetch RSVPs:', result.error || 'Unknown error');
-          setRsvps([]);
+          console.error('Failed to fetch parties:', partiesResult.error);
         }
       } catch (error) {
-        console.error('Error fetching RSVPs:', error);
-        setRsvps([]);
+        console.error('Error fetching data:', error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchRsvps();
+    fetchData();
   }, []);
 
   const handleSignOut = async () => {
@@ -86,10 +150,36 @@ function RSVPList() {
     );
   }
 
+  // Calculate summary statistics
+  const totalParties = parties.length;
+  const respondedParties = parties.filter(p => p.hasResponded).length;
+  const notRespondedParties = totalParties - respondedParties;
+  const totalAttending = parties.reduce((sum, p) => sum + p.attendingCount, 0);
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center mb-8 pb-4 border-b-2 border-gray-300">
-        <h2 className="text-4xl font-bold text-gray-900">Guestbook Entries</h2>
+        <div>
+          <h2 className="text-4xl font-bold text-gray-900 mb-2">RSVP Dashboard</h2>
+          <div className="flex gap-6 text-sm">
+            <div>
+              <span className="font-semibold text-gray-700">Total Invited:</span>{' '}
+              <span className="text-gray-900">{totalParties} parties</span>
+            </div>
+            <div>
+              <span className="font-semibold text-green-700">Responded:</span>{' '}
+              <span className="text-green-900">{respondedParties}</span>
+            </div>
+            <div>
+              <span className="font-semibold text-red-700">Not Responded:</span>{' '}
+              <span className="text-red-900">{notRespondedParties}</span>
+            </div>
+            <div>
+              <span className="font-semibold text-blue-700">Total Attending:</span>{' '}
+              <span className="text-blue-900">{totalAttending} people</span>
+            </div>
+          </div>
+        </div>
         <button
           onClick={handleSignOut}
           className="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700 transition-colors font-semibold shadow-md"
@@ -97,52 +187,17 @@ function RSVPList() {
           Sign Out
         </button>
       </div>
-      {rsvps.length > 0 ? (
-        (() => {
-          // Group RSVPs by party (new format) or show individually (old format)
-          const parties = rsvps.reduce((acc, rsvp) => {
-            // Check if this is the new format with party_id
-            if (rsvp.party_id || rsvp.last_name) {
-              const key = rsvp.party_id || rsvp.last_name || 'unknown';
-              if (!acc[key]) {
-                acc[key] = {
-                  partyId: rsvp.party_id || null,
-                  lastName: rsvp.last_name || 'Unknown',
-                  email: rsvp.email,
-                  members: [],
-                  created_at: rsvp.created_at,
-                  updated_at: rsvp.updated_at || null,
-                };
-              }
-              acc[key].members.push(rsvp);
-              // Track the most recent updated_at across all members
-              if (rsvp.updated_at && (!acc[key].updated_at || new Date(rsvp.updated_at) > new Date(acc[key].updated_at))) {
-                acc[key].updated_at = rsvp.updated_at;
-              }
-            } else {
-              // Old format - treat as individual RSVP
-              const key = `individual-${rsvp.id}`;
-              acc[key] = {
-                partyId: null,
-                lastName: (rsvp as any).name?.split(' ').pop() || 'Individual',
-                email: rsvp.email,
-                members: [rsvp],
-                created_at: rsvp.created_at,
-                updated_at: rsvp.updated_at || null,
-              };
-            }
-            return acc;
-          }, {} as Record<string, { partyId: string | null; lastName: string; email: string; members: RSVP[]; created_at: string; updated_at: string | null }>);
-
-          return Object.values(parties).map((party, idx) => {
-            const partyKey = party.partyId || `party-${idx}`;
-            const isHistoryExpanded = expandedHistory[partyKey] || false;
+      {parties.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {parties.map((party) => {
+          const partyKey = party.id;
+          const isHistoryExpanded = expandedHistory[partyKey] || false;
             
             const fetchHistory = async () => {
               if (historyData[partyKey]) return; // Already loaded
               
               try {
-                const response = await fetch(`/api/rsvps/history?party_id=${party.partyId || ''}`);
+                const response = await fetch(`/api/rsvps/history?party_id=${party.id || ''}`);
                 const result = await response.json();
                 if (result.data) {
                   setHistoryData(prev => ({
@@ -166,29 +221,71 @@ function RSVPList() {
             };
 
             return (
-            <div key={partyKey} className="border-2 border-gray-300 rounded-lg p-5 shadow-lg bg-white">
+            <div key={partyKey} className={`border-2 rounded-lg p-5 shadow-lg ${
+              party.hasResponded 
+                ? party.allMembersResponded 
+                  ? 'border-green-400 bg-green-50' 
+                  : 'border-yellow-400 bg-yellow-50'
+                : 'border-gray-300 bg-white'
+            }`}>
               <div className="mb-4 pb-4 border-b-2 border-gray-300">
                 <div className="flex justify-between items-start">
-                  <div>
-                    <p className="font-bold text-2xl text-gray-900 mb-1">
-                      {party.lastName} {party.partyId ? 'Party' : ''}
-                    </p>
-                    <p className="text-gray-800 text-base font-medium mb-2">{party.email}</p>
-                    <div className="mt-2 space-y-1">
-                      <p className="text-sm text-gray-700">
-                        <span className="font-semibold">Created:</span> {new Date(party.created_at).toLocaleString()}
+                  <div className="flex-1">
+                    <div className="flex items-center gap-3 mb-2">
+                      <p className="font-bold text-2xl text-gray-900">
+                        {party.last_name} Party
                       </p>
-                      {party.updated_at && (
-                        <p className="text-sm text-blue-700 font-semibold">
-                          <span className="font-bold">Updated:</span> {new Date(party.updated_at).toLocaleString()}
+                      <span className={`px-3 py-1 rounded-full text-sm font-bold ${
+                        party.hasResponded
+                          ? party.allMembersResponded
+                            ? 'bg-green-200 text-green-900'
+                            : 'bg-yellow-200 text-yellow-900'
+                          : 'bg-red-200 text-red-900'
+                      }`}>
+                        {party.hasResponded
+                          ? party.allMembersResponded
+                            ? '✓ Complete'
+                            : '⚠ Partial'
+                          : '✗ No Response'}
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4 text-sm mb-2">
+                      <div>
+                        <span className="font-semibold text-gray-700">Members:</span>{' '}
+                        <span className="text-gray-900">
+                          {party.party_members.map(m => `${m.first_name} ${m.last_name}`).join(', ')}
+                        </span>
+                      </div>
+                      {party.hasResponded && (
+                        <>
+                          <div>
+                            <span className="font-semibold text-gray-700">Attending:</span>{' '}
+                            <span className="text-green-700 font-bold">{party.attendingCount} / {party.totalMembers}</span>
+                          </div>
+                          {party.email && (
+                            <div>
+                              <span className="font-semibold text-gray-700">Email:</span>{' '}
+                              <span className="text-gray-900">{party.email}</span>
+                            </div>
+                          )}
+                        </>
+                      )}
+                    </div>
+                    <div className="mt-2 space-y-1 text-xs">
+                      {party.lastUpdated && (
+                        <p className="text-blue-700 font-semibold">
+                          <span className="font-bold">Last Updated:</span> {new Date(party.lastUpdated).toLocaleString()}
                         </p>
+                      )}
+                      {!party.hasResponded && (
+                        <p className="text-red-700 font-semibold">No RSVP submitted yet</p>
                       )}
                     </div>
                   </div>
-                  {party.partyId && (
+                  {party.hasResponded && (
                     <button
                       onClick={toggleHistory}
-                      className="text-sm font-semibold text-blue-700 hover:text-blue-900 hover:underline px-3 py-1 rounded bg-blue-50 border border-blue-200"
+                      className="text-sm font-semibold text-blue-700 hover:text-blue-900 hover:underline px-3 py-1 rounded bg-blue-50 border border-blue-200 ml-4"
                     >
                       {isHistoryExpanded ? 'Hide' : 'View'} History
                     </button>
@@ -233,34 +330,50 @@ function RSVPList() {
                   </div>
                 </div>
               )}
-              <div className="space-y-4">
-                {party.members.map((member) => (
-                  <div key={member.member_id || member.id} className="pl-4 border-l-4 border-gray-400 bg-gray-50 p-3 rounded-r">
-                    <p className="font-bold text-lg text-gray-900 mb-2">
-                      {member.member_name || (member as any).name || 'Unknown'}
-                    </p>
-                    <p className={`text-base font-bold mb-2 ${member.is_attending ? 'text-green-700' : 'text-red-700'}`}>
-                      {member.is_attending ? '✓ Attending' : '✗ Not Attending'}
-                    </p>
-                    {member.dietary_restrictions && (
-                      <div className="mt-2 p-2 bg-yellow-50 border border-yellow-200 rounded">
-                        <p className="text-sm text-gray-900">
-                          <span className="font-bold">Dietary Restrictions:</span> {member.dietary_restrictions}
+              {party.hasResponded ? (
+                <div className="space-y-4">
+                  {party.party_members.map((member) => {
+                    const memberRsvp = party.rsvps.find(r => r.member_id === member.id);
+                    return (
+                      <div key={member.id} className="pl-4 border-l-4 border-gray-400 bg-gray-50 p-3 rounded-r">
+                        <p className="font-bold text-lg text-gray-900 mb-2">
+                          {member.first_name} {member.last_name}
                         </p>
+                        {memberRsvp ? (
+                          <>
+                            <p className={`text-base font-bold mb-2 ${memberRsvp.is_attending ? 'text-green-700' : 'text-red-700'}`}>
+                              {memberRsvp.is_attending ? '✓ Attending' : '✗ Not Attending'}
+                            </p>
+                            {memberRsvp.dietary_restrictions && (
+                              <div className="mt-2 p-2 bg-yellow-50 border border-yellow-200 rounded">
+                                <p className="text-sm text-gray-900">
+                                  <span className="font-bold">Dietary Restrictions:</span> {memberRsvp.dietary_restrictions}
+                                </p>
+                              </div>
+                            )}
+                          </>
+                        ) : (
+                          <p className="text-sm text-gray-600 italic">No response submitted</p>
+                        )}
                       </div>
-                    )}
-                  </div>
-                ))}
-              </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="text-center py-4 text-gray-600">
+                  <p className="font-semibold">Awaiting RSVP</p>
+                  <p className="text-sm mt-1">No response has been submitted for this party yet.</p>
+                </div>
+              )}
             </div>
             );
-          });
-        })()
+          })}
+        </div>
       ) : (
         <div className="text-center py-10">
-          <p className="text-gray-800 text-lg font-semibold mb-2">No RSVPs yet.</p>
+          <p className="text-gray-800 text-lg font-semibold mb-2">No parties found.</p>
           <p className="text-sm text-gray-700">
-            Check the browser console for debugging information.
+            Make sure you have imported your invite list into the database.
           </p>
         </div>
       )}
