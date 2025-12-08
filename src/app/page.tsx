@@ -28,6 +28,7 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [submitted, setSubmitted] = useState(false);
+  const [isUpdate, setIsUpdate] = useState(false);
 
   const handleLastNameLookup = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,16 +50,46 @@ export default function Home() {
         setError(data.error || 'No matching invite found. Please check your last name and try again.');
       } else {
         setParty(data.party);
-        // Initialize RSVP state for each member
-        const initialRsvps: Record<string, MemberRSVP> = {};
-        data.party.members.forEach((member: PartyMember) => {
-          initialRsvps[member.id] = {
-            memberId: member.id,
-            isAttending: false,
-            dietaryRestrictions: '',
-          };
-        });
-        setMemberRsvps(initialRsvps);
+        
+        // Check for existing RSVPs for this party
+        const rsvpCheckResponse = await fetch('/api/rsvps');
+        if (rsvpCheckResponse.ok) {
+          const { data: rsvpData } = await rsvpCheckResponse.json();
+          const existingRsvps = rsvpData?.filter(
+            (r: any) => r.party_id === data.party.id
+          ) || [];
+          
+          const hasExisting = existingRsvps.length > 0;
+          setIsUpdate(hasExisting);
+          
+          // Initialize RSVP state for each member, pre-populating if exists
+          const initialRsvps: Record<string, MemberRSVP> = {};
+          data.party.members.forEach((member: PartyMember) => {
+            const existingRsvp = existingRsvps.find((r: any) => r.member_id === member.id);
+            initialRsvps[member.id] = {
+              memberId: member.id,
+              isAttending: existingRsvp?.is_attending || false,
+              dietaryRestrictions: existingRsvp?.dietary_restrictions || '',
+            };
+          });
+          setMemberRsvps(initialRsvps);
+          
+          // Pre-populate email if exists
+          if (hasExisting && existingRsvps[0]?.email) {
+            setEmail(existingRsvps[0].email);
+          }
+        } else {
+          // If we can't check, just initialize empty
+          const initialRsvps: Record<string, MemberRSVP> = {};
+          data.party.members.forEach((member: PartyMember) => {
+            initialRsvps[member.id] = {
+              memberId: member.id,
+              isAttending: false,
+              dietaryRestrictions: '',
+            };
+          });
+          setMemberRsvps(initialRsvps);
+        }
       }
     } catch (err) {
       setError('An error occurred. Please try again.');
@@ -108,6 +139,7 @@ export default function Home() {
       if (!response.ok) {
         setError(data.error || 'Failed to submit RSVP. Please try again.');
       } else {
+        setIsUpdate(data.isUpdate || false);
         setSubmitted(true);
       }
     } catch (err) {
@@ -124,6 +156,7 @@ export default function Home() {
     setEmail('');
     setError('');
     setSubmitted(false);
+    setIsUpdate(false);
   };
 
   return (
@@ -147,12 +180,14 @@ export default function Home() {
         {submitted ? (
           <div className="text-center space-y-4">
             <h2 className="text-3xl font-bold mb-4">Thank You!</h2>
-            <p className="text-lg">Your RSVP has been submitted successfully.</p>
+            <p className="text-lg">
+              Your RSVP has been {isUpdate ? 'updated' : 'submitted'} successfully.
+            </p>
             <button
               onClick={handleReset}
               className="bg-black text-white px-6 py-2 rounded hover:bg-gray-800 transition-colors"
             >
-              Submit Another RSVP
+              {isUpdate ? 'Update Again' : 'Submit Another RSVP'}
             </button>
           </div>
         ) : !party ? (
@@ -184,7 +219,15 @@ export default function Home() {
           <div className="space-y-6">
             <div className="text-center">
               <h2 className="text-3xl font-bold mb-2">RSVP for {party.lastName} Party</h2>
-              <p className="text-gray-600">Please respond for each person in your party</p>
+              {isUpdate ? (
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
+                  <p className="text-blue-800 font-medium">
+                    You have an existing RSVP. Update your responses below.
+                  </p>
+                </div>
+              ) : (
+                <p className="text-gray-600">Please respond for each person in your party</p>
+              )}
             </div>
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
@@ -260,7 +303,7 @@ export default function Home() {
                   disabled={loading}
                   className="flex-1 bg-black text-white px-6 py-3 rounded hover:bg-gray-800 transition-colors disabled:opacity-50"
                 >
-                  {loading ? 'Submitting...' : 'Submit RSVP'}
+                  {loading ? (isUpdate ? 'Updating...' : 'Submitting...') : (isUpdate ? 'Update RSVP' : 'Submit RSVP')}
                 </button>
               </div>
             </form>

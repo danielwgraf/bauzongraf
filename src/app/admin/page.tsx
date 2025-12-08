@@ -10,14 +10,16 @@ const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 interface RSVP {
   id: string;
-  party_id: string;
-  last_name: string;
-  member_id: string;
-  member_name: string;
+  party_id?: string | null;
+  last_name?: string | null;
+  member_id?: string | null;
+  member_name?: string | null;
   email: string;
   is_attending: boolean;
-  dietary_restrictions: string | null;
+  dietary_restrictions?: string | null;
   created_at: string;
+  // Legacy fields
+  name?: string;
 }
 
 function RSVPList() {
@@ -28,14 +30,24 @@ function RSVPList() {
     const fetchRsvps = async () => {
       try {
         const res = await fetch('/api/rsvps');
+        const result = await res.json();
+        console.log('RSVP fetch response:', result);
+        
         if (res.ok) {
-          const { data } = await res.json();
-          setRsvps(data || []);
+          if (result.error) {
+            console.error('API returned error:', result.error);
+            setRsvps([]);
+          } else {
+            console.log('Setting RSVPs:', result.data);
+            setRsvps(result.data || []);
+          }
         } else {
-          console.error('Failed to fetch RSVPs');
+          console.error('Failed to fetch RSVPs:', result.error || 'Unknown error');
+          setRsvps([]);
         }
       } catch (error) {
         console.error('Error fetching RSVPs:', error);
+        setRsvps([]);
       } finally {
         setLoading(false);
       }
@@ -50,7 +62,12 @@ function RSVPList() {
   };
 
   if (loading) {
-    return <p>Loading RSVPs...</p>;
+    return (
+      <div className="text-center py-10">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black mx-auto mb-4"></div>
+        <p>Loading RSVPs...</p>
+      </div>
+    );
   }
 
   return (
@@ -73,8 +90,8 @@ function RSVPList() {
               const key = rsvp.party_id || rsvp.last_name || 'unknown';
               if (!acc[key]) {
                 acc[key] = {
-                  partyId: rsvp.party_id,
-                  lastName: rsvp.last_name,
+                  partyId: rsvp.party_id || null,
+                  lastName: rsvp.last_name || 'Unknown',
                   email: rsvp.email,
                   members: [],
                   created_at: rsvp.created_at,
@@ -127,7 +144,12 @@ function RSVPList() {
           ));
         })()
       ) : (
-        <p>No RSVPs yet.</p>
+        <div className="text-center py-10">
+          <p className="text-gray-600 mb-2">No RSVPs yet.</p>
+          <p className="text-sm text-gray-400">
+            Check the browser console for debugging information.
+          </p>
+        </div>
       )}
     </div>
   );
