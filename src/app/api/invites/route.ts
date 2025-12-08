@@ -5,9 +5,6 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
-// Expected invites data structure
-// In a real app, this would be stored in a database
-// For now, we'll use a simple in-memory structure
 interface PartyMember {
   id: string;
   firstName: string;
@@ -16,37 +13,9 @@ interface PartyMember {
 
 interface InviteParty {
   id: string;
-  lastName: string; // Primary last name for lookup
+  lastName: string;
   members: PartyMember[];
 }
-
-// TODO: Replace this with your actual invite list
-const EXPECTED_INVITES: InviteParty[] = [
-  {
-    id: '1',
-    lastName: 'Smith',
-    members: [
-      { id: '1-1', firstName: 'John', lastName: 'Smith' },
-      { id: '1-2', firstName: 'Jane', lastName: 'Smith' },
-    ],
-  },
-  {
-    id: '2',
-    lastName: 'Johnson',
-    members: [
-      { id: '2-1', firstName: 'Bob', lastName: 'Johnson' },
-    ],
-  },
-  // Add more parties here
-  {
-    id: '3',
-    lastName: 'Doe',
-    members: [
-      { id: '3-1', firstName: 'John', lastName: 'Doe' },
-      { id: '3-2', firstName: 'Jane', lastName: 'Doe' },
-    ],
-  },
-];
 
 export async function POST(request: Request) {
   const { lastName } = await request.json();
@@ -57,15 +26,78 @@ export async function POST(request: Request) {
 
   // Case-insensitive search for matching last name
   const normalizedSearch = lastName.trim().toLowerCase();
-  const matchingParty = EXPECTED_INVITES.find(
-    (party) => party.lastName.toLowerCase() === normalizedSearch ||
-    party.members.some(member => member.lastName.toLowerCase() === normalizedSearch)
-  );
 
-  if (!matchingParty) {
+  // Find parties where the party's last_name matches (case-insensitive exact match)
+  const { data: parties, error: partiesError } = await supabase
+    .from('parties')
+    .select('id, last_name')
+    .ilike('last_name', normalizedSearch);
+
+  if (partiesError) {
+    console.error('Error fetching parties:', partiesError);
+    return Response.json({ error: 'Database error' }, { status: 500 });
+  }
+
+  // Also search party members for matching last names (case-insensitive exact match)
+  const { data: members, error: membersError } = await supabase
+    .from('party_members')
+    .select('party_id')
+    .ilike('last_name', normalizedSearch);
+
+  if (membersError) {
+    console.error('Error fetching members:', membersError);
+    return Response.json({ error: 'Database error' }, { status: 500 });
+  }
+
+  // Combine party IDs from both searches
+  const partyIds = new Set<string>();
+  parties?.forEach(p => partyIds.add(p.id));
+  members?.forEach(m => partyIds.add(m.party_id));
+
+  if (partyIds.size === 0) {
     return Response.json({ error: 'No matching invite found' }, { status: 404 });
   }
 
-  return Response.json({ party: matchingParty });
+  // Fetch all matching parties with their members
+  const { data: allParties, error: fetchError } = await supabase
+    .from('parties')
+    .select(`
+      id,
+      last_name,
+      party_members (
+        id,
+        first_name,
+        last_name
+      )
+    `)
+    .in('id', Array.from(partyIds));
+
+  if (fetchError) {
+    console.error('Error fetching parties with members:', fetchError);
+    return Response.json({ error: 'Database error' }, { status: 500 });
+  }
+
+  // Transform database format to API format
+  const matchingParties: InviteParty[] = (allParties || []).map(party => ({
+    id: party.id,
+    lastName: party.last_name,
+    members: (party.party_members || []).map((member: any) => ({
+      id: member.id,
+      firstName: member.first_name,
+      lastName: member.last_name,
+    })),
+  }));
+
+  if (matchingParties.length === 0) {
+    return Response.json({ error: 'No matching invite found' }, { status: 404 });
+  }
+
+  // If only one match, return it directly (for backward compatibility)
+  if (matchingParties.length === 1) {
+    return Response.json({ party: matchingParties[0] });
+  }
+
+  // Multiple matches - return all of them for user selection
+  return Response.json({ parties: matchingParties, multiple: true });
 }
 

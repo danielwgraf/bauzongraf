@@ -87,12 +87,12 @@ function RSVPList() {
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-3xl font-bold">Guestbook Entries</h2>
+    <div className="space-y-6">
+      <div className="flex justify-between items-center mb-8 pb-4 border-b-2 border-gray-300">
+        <h2 className="text-4xl font-bold text-gray-900">Guestbook Entries</h2>
         <button
           onClick={handleSignOut}
-          className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition-colors"
+          className="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700 transition-colors font-semibold shadow-md"
         >
           Sign Out
         </button>
@@ -166,21 +166,21 @@ function RSVPList() {
             };
 
             return (
-            <div key={partyKey} className="border rounded-lg p-4 shadow-md bg-white">
-              <div className="mb-3 pb-3 border-b">
+            <div key={partyKey} className="border-2 border-gray-300 rounded-lg p-5 shadow-lg bg-white">
+              <div className="mb-4 pb-4 border-b-2 border-gray-300">
                 <div className="flex justify-between items-start">
                   <div>
-                    <p className="font-bold text-xl">
+                    <p className="font-bold text-2xl text-gray-900 mb-1">
                       {party.lastName} {party.partyId ? 'Party' : ''}
                     </p>
-                    <p className="text-gray-600 text-sm">{party.email}</p>
+                    <p className="text-gray-800 text-base font-medium mb-2">{party.email}</p>
                     <div className="mt-2 space-y-1">
-                      <p className="text-xs text-gray-400">
-                        Created: {new Date(party.created_at).toLocaleString()}
+                      <p className="text-sm text-gray-700">
+                        <span className="font-semibold">Created:</span> {new Date(party.created_at).toLocaleString()}
                       </p>
                       {party.updated_at && (
-                        <p className="text-xs text-blue-600 font-medium">
-                          Updated: {new Date(party.updated_at).toLocaleString()}
+                        <p className="text-sm text-blue-700 font-semibold">
+                          <span className="font-bold">Updated:</span> {new Date(party.updated_at).toLocaleString()}
                         </p>
                       )}
                     </div>
@@ -188,7 +188,7 @@ function RSVPList() {
                   {party.partyId && (
                     <button
                       onClick={toggleHistory}
-                      className="text-sm text-blue-600 hover:text-blue-800 underline"
+                      className="text-sm font-semibold text-blue-700 hover:text-blue-900 hover:underline px-3 py-1 rounded bg-blue-50 border border-blue-200"
                     >
                       {isHistoryExpanded ? 'Hide' : 'View'} History
                     </button>
@@ -196,55 +196,58 @@ function RSVPList() {
                 </div>
               </div>
               {isHistoryExpanded && historyData[partyKey] && (
-                <div className="mb-4 p-3 bg-gray-50 rounded-lg border border-gray-200">
-                  <h4 className="font-semibold text-sm mb-2 text-gray-700">Change History</h4>
-                  <div className="space-y-2 max-h-64 overflow-y-auto">
+                <div className="mb-4 p-4 bg-blue-50 rounded-lg border-2 border-blue-200">
+                  <h4 className="font-bold text-base mb-3 text-gray-900">Change History</h4>
+                  <div className="space-y-3 max-h-64 overflow-y-auto">
                     {historyData[partyKey].length > 0 ? (
                       historyData[partyKey].map((entry) => (
-                        <div key={entry.id} className="text-xs border-l-2 border-gray-300 pl-2">
+                        <div key={entry.id} className="text-sm border-l-4 border-blue-400 pl-3 py-2 bg-white rounded-r">
                           <div className="flex justify-between items-start">
                             <div>
-                              <p className="font-medium">{entry.member_name}</p>
-                              <p className="text-gray-600">
-                                {entry.action === 'created' ? 'Created' : 'Updated'} on{' '}
+                              <p className="font-bold text-gray-900 mb-1">{entry.member_name}</p>
+                              <p className="text-gray-800 text-xs mb-1">
+                                <span className="font-semibold">{entry.action === 'created' ? 'Created' : 'Updated'}</span> on{' '}
                                 {new Date(entry.changed_at).toLocaleString()}
                               </p>
                               {entry.previous_values && (
-                                <div className="mt-1 text-gray-500">
-                                  <p>Previous: {entry.previous_values.is_attending ? 'Attending' : 'Not Attending'}</p>
+                                <div className="mt-2 text-xs text-gray-700 bg-gray-100 p-2 rounded">
+                                  <p className="font-semibold">Previous:</p>
+                                  <p>• {entry.previous_values.is_attending ? 'Attending' : 'Not Attending'}</p>
                                   {entry.previous_values.dietary_restrictions && (
-                                    <p>Dietary: {entry.previous_values.dietary_restrictions}</p>
+                                    <p>• Dietary: {entry.previous_values.dietary_restrictions}</p>
                                   )}
                                 </div>
                               )}
                             </div>
-                            <span className={`text-xs px-2 py-1 rounded ${
-                              entry.is_attending ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                            <span className={`text-xs font-bold px-3 py-1 rounded ${
+                              entry.is_attending ? 'bg-green-200 text-green-900 border border-green-400' : 'bg-red-200 text-red-900 border border-red-400'
                             }`}>
                               {entry.is_attending ? 'Attending' : 'Not Attending'}
                             </span>
                           </div>
-                        </div>
-                      ))
+          </div>
+        ))
                     ) : (
-                      <p className="text-xs text-gray-500">No history available</p>
+                      <p className="text-sm text-gray-700 font-medium">No history available</p>
                     )}
                   </div>
                 </div>
               )}
-              <div className="space-y-3">
+              <div className="space-y-4">
                 {party.members.map((member) => (
-                  <div key={member.member_id || member.id} className="pl-4 border-l-2 border-gray-200">
-                    <p className="font-semibold">
+                  <div key={member.member_id || member.id} className="pl-4 border-l-4 border-gray-400 bg-gray-50 p-3 rounded-r">
+                    <p className="font-bold text-lg text-gray-900 mb-2">
                       {member.member_name || (member as any).name || 'Unknown'}
                     </p>
-                    <p className={`text-sm font-medium ${member.is_attending ? 'text-green-600' : 'text-red-600'}`}>
+                    <p className={`text-base font-bold mb-2 ${member.is_attending ? 'text-green-700' : 'text-red-700'}`}>
                       {member.is_attending ? '✓ Attending' : '✗ Not Attending'}
                     </p>
                     {member.dietary_restrictions && (
-                      <p className="text-sm text-gray-600 mt-1">
-                        <span className="font-medium">Dietary Restrictions:</span> {member.dietary_restrictions}
-                      </p>
+                      <div className="mt-2 p-2 bg-yellow-50 border border-yellow-200 rounded">
+                        <p className="text-sm text-gray-900">
+                          <span className="font-bold">Dietary Restrictions:</span> {member.dietary_restrictions}
+                        </p>
+                      </div>
                     )}
                   </div>
                 ))}
@@ -255,8 +258,8 @@ function RSVPList() {
         })()
       ) : (
         <div className="text-center py-10">
-          <p className="text-gray-600 mb-2">No RSVPs yet.</p>
-          <p className="text-sm text-gray-400">
+          <p className="text-gray-800 text-lg font-semibold mb-2">No RSVPs yet.</p>
+          <p className="text-sm text-gray-700">
             Check the browser console for debugging information.
           </p>
         </div>

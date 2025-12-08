@@ -23,6 +23,7 @@ interface MemberRSVP {
 export default function Home() {
   const [lastName, setLastName] = useState('');
   const [party, setParty] = useState<InviteParty | null>(null);
+  const [matchingParties, setMatchingParties] = useState<InviteParty[]>([]);
   const [memberRsvps, setMemberRsvps] = useState<Record<string, MemberRSVP>>({});
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
@@ -49,46 +50,15 @@ export default function Home() {
       if (!response.ok) {
         setError(data.error || 'No matching invite found. Please check your last name and try again.');
       } else {
-        setParty(data.party);
-        
-        // Check for existing RSVPs for this party
-        const rsvpCheckResponse = await fetch('/api/rsvps');
-        if (rsvpCheckResponse.ok) {
-          const { data: rsvpData } = await rsvpCheckResponse.json();
-          const existingRsvps = rsvpData?.filter(
-            (r: any) => r.party_id === data.party.id
-          ) || [];
-          
-          const hasExisting = existingRsvps.length > 0;
-          setIsUpdate(hasExisting);
-          
-          // Initialize RSVP state for each member, pre-populating if exists
-          const initialRsvps: Record<string, MemberRSVP> = {};
-          data.party.members.forEach((member: PartyMember) => {
-            const existingRsvp = existingRsvps.find((r: any) => r.member_id === member.id);
-            initialRsvps[member.id] = {
-              memberId: member.id,
-              isAttending: existingRsvp?.is_attending || false,
-              dietaryRestrictions: existingRsvp?.dietary_restrictions || '',
-            };
-          });
-          setMemberRsvps(initialRsvps);
-          
-          // Pre-populate email if exists
-          if (hasExisting && existingRsvps[0]?.email) {
-            setEmail(existingRsvps[0].email);
-          }
+        // Check if multiple parties matched
+        if (data.multiple && data.parties) {
+          setMatchingParties(data.parties);
+          setParty(null); // Don't set party yet, user needs to select
         } else {
-          // If we can't check, just initialize empty
-          const initialRsvps: Record<string, MemberRSVP> = {};
-          data.party.members.forEach((member: PartyMember) => {
-            initialRsvps[member.id] = {
-              memberId: member.id,
-              isAttending: false,
-              dietaryRestrictions: '',
-            };
-          });
-          setMemberRsvps(initialRsvps);
+          // Single party match
+          setMatchingParties([]);
+          setParty(data.party);
+          loadPartyData(data.party);
         }
       }
     } catch (err) {
@@ -96,6 +66,54 @@ export default function Home() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const loadPartyData = async (selectedParty: InviteParty) => {
+    // Check for existing RSVPs for this party
+    const rsvpCheckResponse = await fetch('/api/rsvps');
+    if (rsvpCheckResponse.ok) {
+      const { data: rsvpData } = await rsvpCheckResponse.json();
+      const existingRsvps = rsvpData?.filter(
+        (r: any) => r.party_id === selectedParty.id
+      ) || [];
+      
+      const hasExisting = existingRsvps.length > 0;
+      setIsUpdate(hasExisting);
+      
+      // Initialize RSVP state for each member, pre-populating if exists
+      const initialRsvps: Record<string, MemberRSVP> = {};
+      selectedParty.members.forEach((member: PartyMember) => {
+        const existingRsvp = existingRsvps.find((r: any) => r.member_id === member.id);
+        initialRsvps[member.id] = {
+          memberId: member.id,
+          isAttending: existingRsvp?.is_attending || false,
+          dietaryRestrictions: existingRsvp?.dietary_restrictions || '',
+        };
+      });
+      setMemberRsvps(initialRsvps);
+      
+      // Pre-populate email if exists
+      if (hasExisting && existingRsvps[0]?.email) {
+        setEmail(existingRsvps[0].email);
+      }
+    } else {
+      // If we can't check, just initialize empty
+      const initialRsvps: Record<string, MemberRSVP> = {};
+      selectedParty.members.forEach((member: PartyMember) => {
+        initialRsvps[member.id] = {
+          memberId: member.id,
+          isAttending: false,
+          dietaryRestrictions: '',
+        };
+      });
+      setMemberRsvps(initialRsvps);
+    }
+  };
+
+  const handlePartySelection = (selectedParty: InviteParty) => {
+    setParty(selectedParty);
+    setMatchingParties([]);
+    loadPartyData(selectedParty);
   };
 
   const handleMemberRsvpChange = (memberId: string, field: keyof MemberRSVP, value: boolean | string) => {
@@ -152,6 +170,7 @@ export default function Home() {
   const handleReset = () => {
     setLastName('');
     setParty(null);
+    setMatchingParties([]);
     setMemberRsvps({});
     setEmail('');
     setError('');
@@ -188,6 +207,44 @@ export default function Home() {
               className="bg-black text-white px-6 py-2 rounded hover:bg-gray-800 transition-colors"
             >
               {isUpdate ? 'Update Again' : 'Submit Another RSVP'}
+            </button>
+          </div>
+        ) : matchingParties.length > 0 ? (
+          <div className="space-y-6">
+            <div className="text-center">
+              <h2 className="text-3xl font-bold mb-2">Multiple Parties Found</h2>
+              <p className="text-lg text-gray-700 mb-6">
+                We found {matchingParties.length} {matchingParties.length === 1 ? 'party' : 'parties'} with the last name "{lastName}". 
+                Please select which party you belong to:
+              </p>
+            </div>
+            <div className="space-y-4">
+              {matchingParties.map((matchingParty) => (
+                <button
+                  key={matchingParty.id}
+                  onClick={() => handlePartySelection(matchingParty)}
+                  className="w-full text-left border-2 border-gray-300 rounded-lg p-4 hover:border-blue-500 hover:bg-blue-50 transition-colors"
+                >
+                  <div className="font-semibold text-lg text-gray-900 mb-2">
+                    {matchingParty.lastName} Party
+                  </div>
+                  <div className="text-sm text-gray-700">
+                    <p className="mb-1">
+                      <span className="font-medium">Members:</span>{' '}
+                      {matchingParty.members.map(m => `${m.firstName} ${m.lastName}`).join(', ')}
+                    </p>
+                    <p className="text-gray-600">
+                      {matchingParty.members.length} {matchingParty.members.length === 1 ? 'person' : 'people'}
+                    </p>
+                  </div>
+                </button>
+              ))}
+            </div>
+            <button
+              onClick={handleReset}
+              className="w-full text-center text-gray-600 hover:text-gray-800 underline"
+            >
+              Try a different last name
             </button>
           </div>
         ) : !party ? (
