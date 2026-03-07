@@ -28,7 +28,7 @@ export async function GET() {
 
 export async function POST(request: Request) {
   console.log('POST /api/rsvps');
-  const { partyId, lastName, email, memberRsvps, memberNames } = await request.json();
+  const { partyId, lastName, email, accommodation, memberRsvps, memberNames } = await request.json();
 
   if (!partyId || !lastName || !email || !memberRsvps || !Array.isArray(memberRsvps)) {
     return Response.json(
@@ -53,9 +53,12 @@ export async function POST(request: Request) {
   const historyRecords: any[] = [];
 
   // Process each member RSVP
-  for (const memberRsvp of memberRsvps) {
+  for (let i = 0; i < memberRsvps.length; i++) {
+    const memberRsvp = memberRsvps[i];
     const memberName = memberNames?.[memberRsvp.memberId] || 'Unknown';
-    const newRsvpData = {
+    const entreeChoice = memberRsvp.entreeChoice ?? null;
+    const dessertChoice = memberRsvp.dessertChoice ?? null;
+    const newRsvpData: Record<string, unknown> = {
       party_id: partyId,
       last_name: lastName,
       member_id: memberRsvp.memberId,
@@ -63,7 +66,10 @@ export async function POST(request: Request) {
       email: email,
       is_attending: memberRsvp.isAttending,
       dietary_restrictions: memberRsvp.dietaryRestrictions || null,
+      entree_choice: entreeChoice,
+      dessert_choice: dessertChoice,
     };
+    if (i === 0 && accommodation != null) newRsvpData.accommodation = accommodation;
 
     // Find existing RSVP for this member
     const existingRsvp = existingRsvps?.find(
@@ -72,17 +78,27 @@ export async function POST(request: Request) {
 
     if (existingRsvp) {
       // Update existing RSVP
-      const previousValues = {
+      const existingRow = existingRsvp as { entree_choice?: string; dessert_choice?: string; accommodation?: string };
+      const prevEntree = existingRow.entree_choice ?? null;
+      const prevDessert = existingRow.dessert_choice ?? null;
+      const prevAccommodation = existingRow.accommodation ?? null;
+      const previousValues: Record<string, unknown> = {
         is_attending: existingRsvp.is_attending,
         dietary_restrictions: existingRsvp.dietary_restrictions,
         email: existingRsvp.email,
+        entree_choice: prevEntree,
+        dessert_choice: prevDessert,
+        accommodation: i === 0 ? prevAccommodation : undefined,
       };
+      if (i > 0) delete previousValues.accommodation;
 
-      // Check if anything actually changed
       const hasChanges =
         existingRsvp.is_attending !== memberRsvp.isAttending ||
         existingRsvp.dietary_restrictions !== (memberRsvp.dietaryRestrictions || null) ||
-        existingRsvp.email !== email;
+        existingRsvp.email !== email ||
+        prevEntree !== entreeChoice ||
+        prevDessert !== dessertChoice ||
+        (i === 0 && prevAccommodation !== (accommodation ?? null));
 
       if (hasChanges) {
         const { data: updatedData, error: updateError } = await supabase
@@ -109,6 +125,8 @@ export async function POST(request: Request) {
           email: email,
           is_attending: memberRsvp.isAttending,
           dietary_restrictions: memberRsvp.dietaryRestrictions || null,
+          entree_choice: entreeChoice,
+          dessert_choice: dessertChoice,
           action: 'updated',
           previous_values: previousValues,
         });
@@ -141,6 +159,8 @@ export async function POST(request: Request) {
         email: email,
         is_attending: memberRsvp.isAttending,
         dietary_restrictions: memberRsvp.dietaryRestrictions || null,
+        entree_choice: entreeChoice,
+        dessert_choice: dessertChoice,
         action: 'created',
         previous_values: null,
       });

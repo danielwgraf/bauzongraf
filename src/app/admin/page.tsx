@@ -143,9 +143,9 @@ function RSVPList() {
 
   if (loading) {
     return (
-      <div className="text-center py-10">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black mx-auto mb-4"></div>
-        <p>Loading RSVPs...</p>
+      <div className="text-center py-10 text-stone-800">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+        <p className="font-medium">Loading RSVPs...</p>
       </div>
     );
   }
@@ -157,14 +157,14 @@ function RSVPList() {
   const totalAttending = parties.reduce((sum, p) => sum + p.attendingCount, 0);
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center mb-8 pb-4 border-b-2 border-gray-300">
+    <div className="space-y-6 text-stone-800">
+      <div className="flex justify-between items-center mb-8 pb-4 border-b-2 border-stone-200">
         <div>
-          <h2 className="text-4xl font-bold text-gray-900 mb-2">RSVP Dashboard</h2>
+          <h2 className="text-4xl font-bold text-primary mb-2">RSVP Dashboard</h2>
           <div className="flex gap-6 text-sm">
             <div>
-              <span className="font-semibold text-gray-700">Total Invited:</span>{' '}
-              <span className="text-gray-900">{totalParties} parties</span>
+              <span className="font-semibold text-stone-700">Total Invited:</span>{' '}
+              <span className="text-stone-900">{totalParties} parties</span>
             </div>
             <div>
               <span className="font-semibold text-green-700">Responded:</span>{' '}
@@ -221,25 +221,25 @@ function RSVPList() {
             };
 
             return (
-            <div key={partyKey} className={`border-2 rounded-lg p-5 shadow-lg ${
+            <div key={partyKey} className={`border-2 rounded-lg p-5 shadow-sm ${
               party.hasResponded 
                 ? party.allMembersResponded 
                   ? 'border-green-400 bg-green-50' 
-                  : 'border-yellow-400 bg-yellow-50'
-                : 'border-gray-300 bg-white'
+                  : 'border-amber-400 bg-amber-50'
+                : 'border-stone-200 bg-white'
             }`}>
-              <div className="mb-4 pb-4 border-b-2 border-gray-300">
+              <div className="mb-4 pb-4 border-b-2 border-stone-200">
                 <div className="flex justify-between items-start">
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
-                      <p className="font-bold text-2xl text-gray-900">
+                      <p className="font-bold text-2xl text-primary">
                         {party.last_name} Party
                       </p>
                       <span className={`px-3 py-1 rounded-full text-sm font-bold ${
                         party.hasResponded
                           ? party.allMembersResponded
                             ? 'bg-green-200 text-green-900'
-                            : 'bg-yellow-200 text-yellow-900'
+                            : 'bg-amber-200 text-amber-900'
                           : 'bg-red-200 text-red-900'
                       }`}>
                         {party.hasResponded
@@ -251,21 +251,21 @@ function RSVPList() {
                     </div>
                     <div className="grid grid-cols-2 gap-4 text-sm mb-2">
                       <div>
-                        <span className="font-semibold text-gray-700">Members:</span>{' '}
-                        <span className="text-gray-900">
+                        <span className="font-semibold text-stone-700">Members:</span>{' '}
+                        <span className="text-stone-900">
                           {party.party_members.map(m => `${m.first_name} ${m.last_name}`).join(', ')}
                         </span>
                       </div>
                       {party.hasResponded && (
                         <>
                           <div>
-                            <span className="font-semibold text-gray-700">Attending:</span>{' '}
+                            <span className="font-semibold text-stone-700">Attending:</span>{' '}
                             <span className="text-green-700 font-bold">{party.attendingCount} / {party.totalMembers}</span>
                           </div>
                           {party.email && (
                             <div>
-                              <span className="font-semibold text-gray-700">Email:</span>{' '}
-                              <span className="text-gray-900">{party.email}</span>
+                              <span className="font-semibold text-stone-700">Email:</span>{' '}
+                              <span className="text-stone-900">{party.email}</span>
                             </div>
                           )}
                         </>
@@ -285,7 +285,7 @@ function RSVPList() {
                   {party.hasResponded && (
                     <button
                       onClick={toggleHistory}
-                      className="text-sm font-semibold text-blue-700 hover:text-blue-900 hover:underline px-3 py-1 rounded bg-blue-50 border border-blue-200 ml-4"
+                      className="text-sm font-semibold text-primary hover:text-primary/80 hover:underline px-3 py-1 rounded bg-stone-100 border border-stone-200 ml-4"
                     >
                       {isHistoryExpanded ? 'Hide' : 'View'} History
                     </button>
@@ -293,21 +293,21 @@ function RSVPList() {
                 </div>
               </div>
               {isHistoryExpanded && historyData[partyKey] && (
-                <div className="mb-4 p-4 bg-blue-50 rounded-lg border-2 border-blue-200">
-                  <h4 className="font-bold text-base mb-3 text-gray-900">Change History</h4>
+                <div className="mb-4 p-4 bg-stone-50 rounded-lg border-2 border-stone-200">
+                  <h4 className="font-bold text-base mb-3 text-primary">Change History</h4>
                   <div className="space-y-3 max-h-64 overflow-y-auto">
                     {historyData[partyKey].length > 0 ? (
                       historyData[partyKey].map((entry) => (
-                        <div key={entry.id} className="text-sm border-l-4 border-blue-400 pl-3 py-2 bg-white rounded-r">
+                        <div key={entry.id} className="text-sm border-l-4 border-primary/50 pl-3 py-2 bg-white rounded-r">
                           <div className="flex justify-between items-start">
                             <div>
-                              <p className="font-bold text-gray-900 mb-1">{entry.member_name}</p>
-                              <p className="text-gray-800 text-xs mb-1">
+                              <p className="font-bold text-primary mb-1">{entry.member_name}</p>
+                              <p className="text-stone-800 text-xs mb-1">
                                 <span className="font-semibold">{entry.action === 'created' ? 'Created' : 'Updated'}</span> on{' '}
                                 {new Date(entry.changed_at).toLocaleString()}
                               </p>
                               {entry.previous_values && (
-                                <div className="mt-2 text-xs text-gray-700 bg-gray-100 p-2 rounded">
+                                <div className="mt-2 text-xs text-stone-700 bg-stone-100 p-2 rounded">
                                   <p className="font-semibold">Previous:</p>
                                   <p>• {entry.previous_values.is_attending ? 'Attending' : 'Not Attending'}</p>
                                   {entry.previous_values.dietary_restrictions && (
@@ -325,7 +325,7 @@ function RSVPList() {
           </div>
         ))
                     ) : (
-                      <p className="text-sm text-gray-700 font-medium">No history available</p>
+                      <p className="text-sm text-stone-700 font-medium">No history available</p>
                     )}
                   </div>
                 </div>
@@ -335,8 +335,8 @@ function RSVPList() {
                   {party.party_members.map((member) => {
                     const memberRsvp = party.rsvps.find(r => r.member_id === member.id);
                     return (
-                      <div key={member.id} className="pl-4 border-l-4 border-gray-400 bg-gray-50 p-3 rounded-r">
-                        <p className="font-bold text-lg text-gray-900 mb-2">
+                      <div key={member.id} className="pl-4 border-l-4 border-stone-300 bg-stone-50 p-3 rounded-r">
+                        <p className="font-bold text-lg text-primary mb-2">
                           {member.first_name} {member.last_name}
                         </p>
                         {memberRsvp ? (
@@ -345,22 +345,22 @@ function RSVPList() {
                               {memberRsvp.is_attending ? '✓ Attending' : '✗ Not Attending'}
                             </p>
                             {memberRsvp.dietary_restrictions && (
-                              <div className="mt-2 p-2 bg-yellow-50 border border-yellow-200 rounded">
-                                <p className="text-sm text-gray-900">
+                              <div className="mt-2 p-2 bg-amber-50 border border-amber-200 rounded">
+                                <p className="text-sm text-stone-900">
                                   <span className="font-bold">Dietary Restrictions:</span> {memberRsvp.dietary_restrictions}
                                 </p>
                               </div>
                             )}
                           </>
                         ) : (
-                          <p className="text-sm text-gray-600 italic">No response submitted</p>
+                          <p className="text-sm text-stone-600 italic">No response submitted</p>
                         )}
                       </div>
                     );
                   })}
                 </div>
               ) : (
-                <div className="text-center py-4 text-gray-600">
+                <div className="text-center py-4 text-stone-700">
                   <p className="font-semibold">Awaiting RSVP</p>
                   <p className="text-sm mt-1">No response has been submitted for this party yet.</p>
                 </div>
@@ -371,8 +371,8 @@ function RSVPList() {
         </div>
       ) : (
         <div className="text-center py-10">
-          <p className="text-gray-800 text-lg font-semibold mb-2">No parties found.</p>
-          <p className="text-sm text-gray-700">
+          <p className="text-stone-800 text-lg font-semibold mb-2">No parties found.</p>
+          <p className="text-sm text-stone-700">
             Make sure you have imported your invite list into the database.
           </p>
         </div>
@@ -442,10 +442,10 @@ export default function AdminPage() {
   // Show loading spinner while checking auth state
   if (isLoadingAuth) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-100">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black mx-auto mb-4"></div>
-          <p>Loading...</p>
+      <div className="flex items-center justify-center min-h-screen bg-stone-50">
+        <div className="text-center text-stone-800">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="font-medium">Loading...</p>
         </div>
       </div>
     );
@@ -453,21 +453,21 @@ export default function AdminPage() {
 
   if (user) {
     return (
-      <main className="container mx-auto px-4 py-10">
+      <main className="min-h-screen bg-stone-50 container mx-auto px-4 py-10">
         <RSVPList />
       </main>
     );
   }
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <div className="p-8 bg-white rounded-lg shadow-md w-full max-w-sm">
-        <h1 className="text-2xl font-bold text-center mb-6">Admin Login</h1>
+    <div className="flex items-center justify-center min-h-screen bg-stone-50">
+      <div className="p-8 bg-white rounded-lg shadow-md w-full max-w-sm border border-stone-200">
+        <h1 className="text-2xl font-bold text-center mb-6 text-primary">Admin Login</h1>
         <form onSubmit={handleSignIn}>
           <div className="mb-4">
             <label
               htmlFor="email"
-              className="block text-sm font-medium text-gray-700 mb-1"
+              className="block text-sm font-medium text-stone-800 mb-1"
             >
               Email Address
             </label>
@@ -476,24 +476,24 @@ export default function AdminPage() {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full border rounded p-2"
+              className="w-full border border-stone-300 rounded p-2 bg-white text-stone-900"
               required
             />
           </div>
           {message && (
-            <p className={`text-sm mb-4 ${message.includes('Error') ? 'text-red-500' : 'text-green-600'}`}>
+            <p className={`text-sm mb-4 font-medium ${message.includes('Error') ? 'text-red-600' : 'text-green-700'}`}>
               {message}
             </p>
           )}
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-black text-white px-4 py-2 rounded hover:bg-gray-800 transition-colors disabled:opacity-50"
+            className="w-full bg-primary text-white px-4 py-2 rounded hover:bg-primary/90 transition-colors disabled:opacity-50 font-sans"
           >
             {loading ? 'Sending...' : 'Send Magic Link'}
           </button>
         </form>
-        <p className="text-xs text-gray-500 mt-4 text-center">
+        <p className="text-xs text-stone-600 mt-4 text-center">
           Enter your email to receive a secure login link
         </p>
       </div>
