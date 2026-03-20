@@ -83,3 +83,157 @@ body {
     transform-origin: center;
   }
 }
+
+/* Mobile invitation "letter opening" animation */
+.letter-frame-reveal {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  clip-path: inset(50% 50% 50% 50%);
+  opacity: 0;
+  transition: clip-path 700ms cubic-bezier(0.22, 1, 0.36, 1), opacity 300ms ease;
+  will-change: clip-path, opacity;
+  pointer-events: none;
+}
+
+.letter-frame-reveal.letter-open {
+  clip-path: inset(0 0 0 0);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.letter-monogram-reveal {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  opacity: 1;
+  transition: opacity 250ms ease, transform 700ms cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
+}
+
+.letter-monogram-reveal.letter-open {
+  opacity: 0;
+  transform: scale(0.96);
+}
+
+.letter-text-reveal {
+  z-index: 20;
+  opacity: 0;
+  transform: translateY(10px);
+  pointer-events: none;
+  transition: opacity 260ms ease, transform 650ms cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
+}
+
+.letter-text-reveal.letter-open {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+  transition-delay: 0ms;
+}
+
+.letter-stagger {
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 260ms ease, transform 650ms cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
+  pointer-events: none;
+}
+
+.letter-text-reveal.letter-open .letter-stagger-1 {
+  opacity: 1;
+  transform: translateY(0);
+  transition-delay: 0ms;
+  pointer-events: auto;
+}
+
+.letter-text-reveal.letter-open .letter-stagger-2 {
+  opacity: 1;
+  transform: translateY(0);
+  transition-delay: 140ms;
+  pointer-events: auto;
+}
+
+.letter-text-reveal.letter-open .letter-stagger-3 {
+  opacity: 1;
+  transform: translateY(0);
+  transition-delay: 280ms;
+  pointer-events: auto;
+}
+
+.letter-text-reveal.letter-open .letter-stagger-4 {
+  opacity: 1;
+  transform: translateY(0);
+  transition-delay: 420ms;
+  pointer-events: auto;
+}
+
+.mobile-details {
+  overflow: hidden;
+  max-height: 0;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: max-height 450ms ease, opacity 250ms ease,
+    transform 450ms cubic-bezier(0.22, 1, 0.36, 1);
+  pointer-events: none;
+}
+
+.mobile-details.mobile-details-open {
+  max-height: 60vh;
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.letter-open-button {
+  position: absolute;
+  left: 50%;
+  top: 52%;
+  transform: translate(-50%, -50%);
+  z-index: 30;
+  transition: opacity 200ms ease, transform 200ms ease;
+}
+
+.letter-open-button-hide {
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, -50%) scale(0.98);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .letter-frame-reveal,
+  .letter-monogram-reveal,
+  .letter-text-reveal,
+  .letter-open-button {
+    transition: none !important;
+  }
+
+  .letter-stagger,
+  .mobile-details {
+    transition: none !important;
+  }
+}
+
+/* Desktop/tablet: no animation flow; show frame + text normally */
+@media (min-width: 769px) {
+  .letter-frame-reveal {
+    clip-path: inset(0 0 0 0);
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .letter-monogram-reveal {
+    display: none;
+  }
+
+  .letter-text-reveal {
+    opacity: 1;
+    transform: none;
+    pointer-events: auto;
+    transition-delay: 0s;
+  }
+
+  .letter-open-button {
+    display: none;
+  }
+}

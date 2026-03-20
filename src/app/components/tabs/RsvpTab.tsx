@@ -72,7 +72,7 @@ export default function RsvpTab({
                 <button
                   key={matchingParty.id}
                   onClick={() => onPartySelection(matchingParty)}
-                  className="w-full text-left border-2 border-stone-300 rounded-lg p-4 hover:border-primary hover:bg-white transition-colors bg-white"
+                  className="w-full font-oldforge text-left border-2 border-stone-300 rounded-lg p-4 hover:border-primary hover:bg-white transition-colors bg-white"
                 >
                   <div className="font-semibold text-lg text-primary mb-2">
                     {matchingParty.lastName} Party
@@ -99,7 +99,7 @@ export default function RsvpTab({
         ) : !party ? (
           <div className="text-center space-y-4">
             <h2 className="font-parochus-original text-3xl text-primary mb-6">RSVP</h2>
-            <p className="font-cormorant text-lg text-stone-800 mb-6">Please enter your last name to find your invitation.</p>
+            <p className="font-oldforge text-lg text-stone-800 mb-6">Please enter your last name to find your invitation.</p>
             <form onSubmit={onLastNameLookup} className="space-y-4">
               <input
                 type="text"
@@ -107,15 +107,15 @@ export default function RsvpTab({
                 value={lastName}
                 onChange={(e) => setLastName(e.target.value)}
                 required
-                className="w-full border border-stone-300 rounded p-3 text-lg bg-white text-stone-900 placeholder-stone-400"
+                className="w-full border font-oldforge border-stone-300 rounded p-3 text-lg bg-white text-stone-900 placeholder-stone-400"
               />
               {error && (
-                <p className="text-red-600 text-sm font-medium">{error}</p>
+                <p className="text-red-600 text-sm font-oldforge font-medium">{error}</p>
               )}
               <button
                 type="submit"
                 disabled={loading}
-                className="bg-primary text-white px-6 py-3 rounded hover:bg-primary/90 transition-colors disabled:opacity-50 w-full font-sans"
+                className="bg-primary font-oldforge uppercase text-white px-6 py-3 rounded hover:bg-primary/90 transition-colors disabled:opacity-50 w-full font-sans"
               >
                 {loading ? 'Looking up...' : 'Find My Invitation'}
               </button>
@@ -127,17 +127,17 @@ export default function RsvpTab({
               <h2 className="font-parochus-original text-3xl text-primary mb-2">RSVP for {party.lastName} Party</h2>
               {isUpdate ? (
                 <div className="bg-amber-50/80 border border-amber-200 rounded-lg p-3 mb-4">
-                  <p className="text-amber-900 font-medium">
+                  <p className="text-amber-900 font-oldforge font-medium">
                     You have an existing RSVP. Update your responses below.
                   </p>
                 </div>
               ) : (
-                <p className="font-cormorant text-lg text-stone-700">Please respond for each person in your party</p>
+                <p className="font-oldforge text-lg text-stone-700">Please respond for each person in your party</p>
               )}
             </div>
             <form onSubmit={onSubmit} className="space-y-6">
               <div>
-                <label htmlFor="email" className="block text-sm font-medium mb-2 text-stone-800">
+                <label htmlFor="email" className="block text-sm font-oldforge font-medium mb-2 text-stone-800">
                   Contact Email
                 </label>
                 <input
@@ -147,32 +147,32 @@ export default function RsvpTab({
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="w-full border border-stone-300 rounded p-3 bg-white text-stone-900 placeholder-stone-400"
+                  className="w-full border font-oldforge border-stone-300 rounded p-3 bg-white text-stone-900 placeholder-stone-400"
                 />
               </div>
 
               <div>
-                <p className="text-sm font-medium mb-2 text-stone-800">Accommodation</p>
+                <p className="text-sm font-oldforge font-medium mb-2 text-stone-800">Accommodation</p>
                 <div className="space-y-2">
-                  <label className="flex items-center gap-2 text-stone-800 cursor-pointer">
+                  <label className="flex font-oldforge items-center gap-2 text-stone-800 cursor-pointer">
                     <input
                       type="radio"
                       name="accommodation"
                       value="chateau"
                       checked={accommodation === 'chateau'}
                       onChange={() => setAccommodation('chateau')}
-                      className="w-4 h-4 border-stone-300 text-primary"
+                      className="w-4 h-4 border-stone-300 font-oldforge text-primary"
                     />
                     <span>I will be staying at the Château</span>
                   </label>
-                  <label className="flex items-center gap-2 text-stone-800 cursor-pointer">
+                  <label className="flex font-oldforge items-center gap-2 text-stone-800 cursor-pointer">
                     <input
                       type="radio"
                       name="accommodation"
                       value="elsewhere"
                       checked={accommodation === 'elsewhere'}
                       onChange={() => setAccommodation('elsewhere')}
-                      className="w-4 h-4 border-stone-300 text-primary"
+                      className="w-4 h-4 font-oldforge border-stone-300 text-primary"
                     />
                     <span>I plan on arranging my own accommodation elsewhere</span>
                   </label>
@@ -180,14 +180,14 @@ export default function RsvpTab({
               </div>
 
               <div className="space-y-6">
-                <h3 className="font-parochus-original text-xl text-primary">Party Members</h3>
+                <h3 className="font-oldforge uppercase text-xl text-primary">Party Members</h3>
                 {party.members.map((member) => (
                   <div key={member.id} className="border border-stone-200 rounded-lg p-4 space-y-4 bg-white">
-                    <h4 className="font-sans text-lg font-semibold text-primary">
+                    <h4 className="font-sans font-oldforge text-lg font-semibold text-primary">
                       {member.firstName} {member.lastName}
                     </h4>
                     <div className="space-y-3">
-                      <label className="flex items-center space-x-2 text-stone-800 cursor-pointer">
+                      <label className="flex font-oldforge items-center space-x-2 text-stone-800 cursor-pointer">
                         <input
                           type="checkbox"
                           checked={memberRsvps[member.id]?.isAttending || false}
@@ -201,12 +201,12 @@ export default function RsvpTab({
                       {memberRsvps[member.id]?.isAttending && (
                         <>
                           <div className="space-y-4">
-                            <p className="text-sm text-stone-600 italic">Starter: {MEAL_APPETIZER}</p>
+                            <p className="text-sm font-oldforge text-stone-600 italic">Starter: {MEAL_APPETIZER}</p>
                             <div>
-                              <p className="text-sm font-medium mb-2 text-stone-800">Entrée (choose one) <span className="text-primary">*</span></p>
+                              <p className="text-sm font-oldforge font-medium mb-2 text-stone-800">Entrée (choose one) <span className="text-primary">*</span></p>
                               <div className="space-y-2" role="group" aria-required="true">
                                 {ENTREE_OPTIONS.map((option) => (
-                                  <label key={option.id} className="flex items-start gap-2 text-stone-800 cursor-pointer">
+                                  <label key={option.id} className="flex font-oldforge items-start gap-2 text-stone-800 cursor-pointer">
                                     <input
                                       type="radio"
                                       name={`entree-${member.id}`}
@@ -221,12 +221,12 @@ export default function RsvpTab({
                                 ))}
                               </div>
                             </div>
-                            <p className="text-sm text-stone-600 italic">Cheese course</p>
+                            <p className="text-sm font-oldforge text-stone-600 italic">Cheese course</p>
                             <div>
-                              <p className="text-sm font-medium mb-2 text-stone-800">Dessert (choose one) <span className="text-primary">*</span></p>
+                              <p className="text-sm font-oldforge font-medium mb-2 text-stone-800">Dessert (choose one) <span className="text-primary">*</span></p>
                               <div className="space-y-2" role="group" aria-required="true">
                                 {DESSERT_OPTIONS.map((option) => (
-                                  <label key={option.id} className="flex items-start gap-2 text-stone-800 cursor-pointer">
+                                  <label key={option.id} className="flex font-oldforge items-start gap-2 text-stone-800 cursor-pointer">
                                     <input
                                       type="radio"
                                       name={`dessert-${member.id}`}
@@ -243,7 +243,7 @@ export default function RsvpTab({
                             </div>
                           </div>
                           <div>
-                            <label htmlFor={`dietary-${member.id}`} className="block text-sm font-medium mb-2 text-stone-800">
+                            <label htmlFor={`dietary-${member.id}`} className="block font-oldforge text-sm font-medium mb-2 text-stone-800">
                               Dietary Restrictions (optional)
                             </label>
                             <textarea
@@ -253,7 +253,7 @@ export default function RsvpTab({
                               onChange={(e) =>
                                 onMemberRsvpChange(member.id, 'dietaryRestrictions', e.target.value)
                               }
-                              className="w-full border border-stone-300 rounded p-2 bg-white text-stone-900 placeholder-stone-400"
+                              className="w-full font-oldforge border border-stone-300 rounded p-2 bg-white text-stone-900 placeholder-stone-400"
                               rows={2}
                             />
                           </div>

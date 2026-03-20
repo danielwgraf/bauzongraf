@@ -69,7 +69,7 @@ export default function FAQTab() {
     <section className="min-h-screen pt-24 pb-16 px-4 bg-secondary">
       <div className="max-w-3xl mx-auto">
         <header className="text-center mb-14">
-          <p className="font-oldforge text-2xl text-primary mb-2">Common questions</p>
+          <p className="font-oldforge text-2xl text-primary mb-2">COMMON QUESTIONS</p>
           <h2 className="font-parochus-original text-4xl md:text-5xl text-primary mb-6">
             Frequently Asked Questions
           </h2>
@@ -80,10 +80,10 @@ export default function FAQTab() {
           {FAQ_ITEMS.map((item, index) => (
             <Fragment key={index}>
               <article className="py-6">
-                <h3 className="font-oldforge text-2xl md:text-3xl text-primary mb-4">
+                <h3 className="font-oldforge text-2xl md:text-3xl text-primary mb-4 uppercase">
                   {item.question}
                 </h3>
-                <div className="font-cormorant text-lg text-stone-800 leading-relaxed">
+                <div className="font-oldforge text-lg text-stone-800 leading-relaxed">
                   {item.answer ? formatAnswer(item.answer) : null}
                 </div>
               </article>
