@@ -42,6 +42,10 @@ export default function RsvpTab({
   onSubmit,
   onReset,
 }: RsvpTabProps) {
+  const attendingCount = party?.members.filter((member) => memberRsvps[member.id]?.isAttending).length ?? 0;
+  const anyAttending = attendingCount > 0;
+  const accommodationSubject = attendingCount > 1 ? 'We' : 'I';
+
   return (
     <main className="min-h-screen bg-secondary px-4 pt-24 pb-16">
       <div className="mx-auto max-w-2xl">
@@ -151,34 +155,6 @@ export default function RsvpTab({
                 />
               </div>
 
-              <div>
-                <p className="text-sm font-oldforge font-medium mb-2 text-stone-800">Accommodation</p>
-                <div className="space-y-2">
-                  <label className="flex font-oldforge items-center gap-2 text-stone-800 cursor-pointer">
-                    <input
-                      type="radio"
-                      name="accommodation"
-                      value="chateau"
-                      checked={accommodation === 'chateau'}
-                      onChange={() => setAccommodation('chateau')}
-                      className="w-4 h-4 border-stone-300 font-oldforge text-primary"
-                    />
-                    <span>I will be staying at the Château</span>
-                  </label>
-                  <label className="flex font-oldforge items-center gap-2 text-stone-800 cursor-pointer">
-                    <input
-                      type="radio"
-                      name="accommodation"
-                      value="elsewhere"
-                      checked={accommodation === 'elsewhere'}
-                      onChange={() => setAccommodation('elsewhere')}
-                      className="w-4 h-4 font-oldforge border-stone-300 text-primary"
-                    />
-                    <span>I plan on arranging my own accommodation elsewhere</span>
-                  </label>
-                </div>
-              </div>
-
               <div className="space-y-6">
                 <h3 className="font-oldforge uppercase text-xl text-primary">Party Members</h3>
                 {party.members.map((member) => (
@@ -263,6 +239,36 @@ export default function RsvpTab({
                   </div>
                 ))}
               </div>
+
+              {anyAttending && (
+                <div>
+                  <p className="text-sm font-oldforge font-medium mb-2 text-stone-800">Accommodation</p>
+                  <div className="space-y-2">
+                    <label className="flex font-oldforge items-center gap-2 text-stone-800 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="accommodation"
+                        value="chateau"
+                        checked={accommodation === 'chateau'}
+                        onChange={() => setAccommodation('chateau')}
+                        className="w-4 h-4 border-stone-300 font-oldforge text-primary"
+                      />
+                      <span>{accommodationSubject} will be staying at the Château</span>
+                    </label>
+                    <label className="flex font-oldforge items-center gap-2 text-stone-800 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="accommodation"
+                        value="elsewhere"
+                        checked={accommodation === 'elsewhere'}
+                        onChange={() => setAccommodation('elsewhere')}
+                        className="w-4 h-4 font-oldforge border-stone-300 text-primary"
+                      />
+                      <span>{accommodationSubject} plan on arranging {accommodationSubject === 'We' ? 'our' : 'my'} own accommodation elsewhere</span>
+                    </label>
+                  </div>
+                </div>
+              )}
 
               {error && (
                 <p className="text-red-600 text-sm font-medium">{error}</p>

@@ -148,11 +148,11 @@ function HomeContent() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!party) return;
-    if (!accommodation) {
+    const attendingMembers = party.members.filter((m) => memberRsvps[m.id]?.isAttending);
+    if (attendingMembers.length > 0 && !accommodation) {
       setError('Please select your accommodation preference.');
       return;
     }
-    const attendingMembers = party.members.filter((m) => memberRsvps[m.id]?.isAttending);
     for (const member of attendingMembers) {
       const rsvp = memberRsvps[member.id];
       if (!rsvp?.entreeChoice?.trim()) {
@@ -180,7 +180,7 @@ function HomeContent() {
           partyId: party.id,
           lastName: party.lastName,
           email,
-          accommodation: accommodation || null,
+          accommodation: attendingMembers.length > 0 ? accommodation : null,
           memberRsvps: Object.values(memberRsvps),
           memberNames,
         }),
