@@ -2,7 +2,7 @@ import Image from 'next/image';
 
 export default function VenueTab() {
   return (
-    <section className="relative min-h-screen pt-24 pb-16 px-4 bg-secondary overflow-hidden">
+    <section className="relative min-h-dvh pt-24 pb-16 px-4 bg-secondary overflow-hidden">
       <div className="absolute bottom-0 left-0 right-0 flex items-end justify-start pointer-events-none pl-0" aria-hidden>
         <div className="relative w-full max-w-6xl h-[100%] min-h-[500px]">
           <Image

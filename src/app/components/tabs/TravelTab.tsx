@@ -1,6 +1,6 @@
 export default function TravelTab() {
   return (
-    <section className="min-h-screen pt-24 pb-16 px-4 bg-secondary">
+    <section className="min-h-dvh pt-24 pb-16 px-4 bg-secondary">
       <main className="max-w-3xl mx-auto">
         <p className="font-oldforge uppercase text-2xl text-primary mb-2">Getting There</p>
         <h2 className="font-parochus-original text-4xl md:text-5xl text-primary mb-6">Travel & Directions</h2>

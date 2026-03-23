@@ -47,7 +47,7 @@ export default function RsvpTab({
   const accommodationSubject = attendingCount > 1 ? 'We' : 'I';
 
   return (
-    <main className="min-h-screen bg-secondary px-4 pt-24 pb-16">
+    <main className="min-h-dvh bg-secondary px-4 pt-24 pb-16">
       <div className="mx-auto max-w-2xl">
         {submitted ? (
           <div className="text-center space-y-4">

@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 :root {
-  --background: #fafaf9;
+  --background: #efe7dc;
   --foreground: #1c1917;
 }
 
@@ -15,8 +15,12 @@
 }
 
 /* Wedding site stays light for readability; no dark-mode flip */
+html {
+  background: var(--color-secondary);
+}
+
 body {
-  background: var(--background);
+  background: var(--color-secondary);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }

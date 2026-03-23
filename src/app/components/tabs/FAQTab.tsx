@@ -66,7 +66,7 @@ const FAQ_ITEMS: { question: string; answer: string }[] = [
 
 export default function FAQTab() {
   return (
-    <section className="min-h-screen pt-24 pb-16 px-4 bg-secondary">
+    <section className="min-h-dvh pt-24 pb-16 px-4 bg-secondary">
       <div className="max-w-3xl mx-auto">
         <header className="text-center mb-14">
           <p className="font-oldforge text-2xl text-primary mb-2">COMMON QUESTIONS</p>
