@@ -84,6 +84,15 @@ body {
   }
 }
 
+/* Mobile landing: larger copy than default container scale */
+@media (max-width: 768px) {
+  @container frame (min-width: 0px) {
+    .landing-overlay-content {
+      transform: scale(calc(100cqw / 520));
+    }
+  }
+}
+
 /* Mobile invitation "letter opening" animation */
 .letter-frame-reveal {
   position: absolute;
@@ -107,13 +116,14 @@ body {
   inset: 0;
   z-index: 10;
   opacity: 1;
+  transform: translateY(-6%);
   transition: opacity 250ms ease, transform 700ms cubic-bezier(0.22, 1, 0.36, 1);
   will-change: opacity, transform;
 }
 
 .letter-monogram-reveal.letter-open {
   opacity: 0;
-  transform: scale(0.96);
+  transform: translateY(-6%) scale(0.96);
 }
 
 .letter-text-reveal {
@@ -168,27 +178,25 @@ body {
   pointer-events: auto;
 }
 
-.mobile-details {
-  overflow: hidden;
-  max-height: 0;
-  opacity: 0;
-  transform: translateY(8px);
-  transition: max-height 450ms ease, opacity 250ms ease,
-    transform 450ms cubic-bezier(0.22, 1, 0.36, 1);
-  pointer-events: none;
+@keyframes landing-mobile-step-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-.mobile-details.mobile-details-open {
-  max-height: 60vh;
-  opacity: 1;
-  transform: translateY(0);
-  pointer-events: auto;
+.landing-mobile-step-enter {
+  animation: landing-mobile-step-in 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 .letter-open-button {
   position: absolute;
   left: 50%;
-  top: 52%;
+  top: 70%;
   transform: translate(-50%, -50%);
   z-index: 30;
   transition: opacity 200ms ease, transform 200ms ease;
@@ -208,9 +216,12 @@ body {
     transition: none !important;
   }
 
-  .letter-stagger,
-  .mobile-details {
+  .letter-stagger {
     transition: none !important;
+  }
+
+  .landing-mobile-step-enter {
+    animation: none !important;
   }
 }
 

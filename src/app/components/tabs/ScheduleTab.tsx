@@ -13,22 +13,22 @@ export default function ScheduleTab() {
         <div className="space-y-10">
           <div className="border-l-2 border-primary/30 pl-6">
             <h3 className="font-oldforge uppercase font-semibold text-primary text-lg mb-1">Thursday, October 1st</h3>
-            <p className="font-oldforge text-xl text-stone-800">Welcome dinner</p>
+            <p className="font-oldforge text-xl text-stone-800">Welcome Dinner</p>
           </div>
 
           <div className="border-l-2 border-primary/30 pl-6">
             <h3 className="font-oldforge uppercase font-semibold text-primary text-lg mb-1">Friday, October 2nd</h3>
-            <p className="font-oldforge text-xl text-stone-800">Rehearsal dinner</p>
+            <p className="font-oldforge text-xl text-stone-800">Rehearsal Dinner</p>
           </div>
 
           <div className="border-l-2 border-primary/30 pl-6">
             <h3 className="font-oldforge uppercase font-semibold text-primary text-lg mb-1">Saturday, October 3rd</h3>
-            <p className="font-oldforge text-xl text-stone-800">Wedding ceremony &amp; reception</p>
+            <p className="font-oldforge text-xl text-stone-800">Wedding Ceremony &amp; Reception</p>
           </div>
 
           <div className="border-l-2 border-primary/30 pl-6">
             <h3 className="font-oldforge uppercase font-semibold text-primary text-lg mb-1">Sunday, October 4th</h3>
-            <p className="font-oldforge text-xl text-stone-800">Farewell brunch</p>
+            <p className="font-oldforge text-xl text-stone-800">Farewell Brunch</p>
           </div>
         </div>
 

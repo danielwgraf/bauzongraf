@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, useCallback, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import type { InviteParty, MemberRSVP, TabId } from './types';
 import { TABS } from './types';
@@ -38,6 +38,12 @@ function HomeContent() {
   const [error, setError] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const [isUpdate, setIsUpdate] = useState(false);
+  /** Mobile landing: after user finishes the step flow once, skip to summary when returning Home (session state, no localStorage) */
+  const [landingMobileIntroComplete, setLandingMobileIntroComplete] = useState(false);
+
+  const markLandingMobileIntroComplete = useCallback(() => {
+    setLandingMobileIntroComplete(true);
+  }, []);
 
   useEffect(() => {
     const t = searchParams.get('tab');
@@ -217,7 +223,13 @@ function HomeContent() {
     <>
       <NavBar activeTab={activeTab} tabs={TABS} goToTab={goToTab} tabLabels={TAB_LABELS} />
 
-      {activeTab === 'landing' && <LandingTab onGoToRsvp={() => goToTab('rsvp')} />}
+      {activeTab === 'landing' && (
+        <LandingTab
+          onGoToRsvp={() => goToTab('rsvp')}
+          mobileIntroComplete={landingMobileIntroComplete}
+          onMobileIntroComplete={markLandingMobileIntroComplete}
+        />
+      )}
       {activeTab === 'venue' && <VenueTab />}
       {activeTab === 'schedule' && <ScheduleTab />}
       {activeTab === 'things-to-do' && <ThingsToDoTab />}
