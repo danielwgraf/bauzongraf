@@ -71,7 +71,7 @@ export default function NavBar({ activeTab, tabs, goToTab, tabLabels }: NavBarPr
         <div className="max-w-5xl mx-auto px-4 py-3">
           <div className="flex items-center justify-between gap-4 overflow-x-auto">
             <Image
-              src="/images/monogram.png"
+              src="/images/monogram_red.png"
               alt="Macy & Daniel"
               width={120}
               height={40}
@@ -115,7 +115,7 @@ export default function NavBar({ activeTab, tabs, goToTab, tabLabels }: NavBarPr
         >
           <div className="flex items-center justify-between px-4 py-3 border-b border-primary/10">
             <Image
-            src="/images/monogram.png"
+            src="/images/monogram_red.png"
             alt="Macy & Daniel"
             width={120}
             height={40}
