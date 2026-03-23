@@ -60,7 +60,7 @@ export default function LandingTab({
   }, [opened, mobileStep, onMobileIntroComplete]);
 
   return (
-    <section className="min-h-screen relative pt-14 bg-secondary">
+    <section className="min-h-dvh relative pt-14 bg-secondary">
       <div className="absolute inset-x-0 bottom-0 top-14 flex items-center justify-center overflow-hidden bg-secondary">
         <div className="landing-frame relative overflow-hidden [container-type:size] [container-name:frame]">
           {/* Mobile initial view: monogram only. After opening: reveal frame + text. */}
