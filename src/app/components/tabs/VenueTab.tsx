@@ -26,7 +26,7 @@ export default function VenueTab() {
           walls, ordered façades, and gardens laid out in the French tradition, with boxwood and roses
           still defining the outdoor rooms between the house and the slope.
         </p>
-        <p className="font-oldforge text-lg text-stone-700 mb-4 text-left max-w-2xl mx-auto">
+        <p className="font-oldforge text-xl text-stone-800 mb-4 text-left max-w-2xl mx-auto">
           The property sits on several hectares of parkland; a small chapel and later additions belong to
           the same continuum of use—first as a family seat, now as a place where the fabric of the
           building and the land still tell the story of how people lived and worked here across
