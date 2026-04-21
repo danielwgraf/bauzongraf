@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { buildVenmoPayUrl, getVenmoLinks, type VenmoLink } from "../../registry-config";
+import { buildVenmoPaymentUrls, getVenmoLinks, type VenmoLink } from "../../registry-config";
 import {
   REGISTRY_FUNDS,
   type RegistryFundId,
@@ -82,8 +82,18 @@ export default function RegistryTab() {
         setVenmoError(data.error ?? "Could not save your gift details.");
         return;
       }
-      const payUrl = buildVenmoPayUrl(link.href, baseAmount, venmoNoteForUrl(fund, guestNote));
-      window.open(payUrl, "_blank", "noopener,noreferrer");
+      const { appUrl, webUrl } = buildVenmoPaymentUrls(link.href, baseAmount, venmoNoteForUrl(fund, guestNote));
+      const isMobile = /android|iphone|ipad|ipod/i.test(navigator.userAgent);
+
+      if (isMobile) {
+        // Prefer app deep link on mobile, then fall back to web profile if app is unavailable.
+        window.location.href = appUrl;
+        window.setTimeout(() => {
+          window.location.href = webUrl;
+        }, 900);
+      } else {
+        window.open(webUrl, "_blank", "noopener,noreferrer");
+      }
     } catch {
       setVenmoError("Something went wrong. Please try again.");
     } finally {
