@@ -34,6 +34,7 @@ export async function POST(request: NextRequest) {
     const body = (await request.json().catch(() => ({}))) as {
       fund?: string;
       amount?: number | string;
+      giverName?: string;
       coverStripeFees?: boolean;
       note?: string;
       website?: string;
@@ -52,7 +53,9 @@ export async function POST(request: NextRequest) {
     const fund = body.fund;
     const amountRaw = body.amount;
     const coverStripeFees = Boolean(body.coverStripeFees);
+    const giverName = typeof body.giverName === "string" ? body.giverName.trim().slice(0, 120) : "";
     const noteRaw = typeof body.note === "string" ? body.note.trim().slice(0, 2000) : "";
+    const storedNote = [giverName ? `From: ${giverName}` : "", noteRaw].filter(Boolean).join("\n");
 
     if (
       !fund ||
@@ -112,6 +115,7 @@ export async function POST(request: NextRequest) {
       metadata: {
         fund,
         amountUsd: amountNum.toFixed(2),
+        ...(giverName ? { giverName } : {}),
         coverStripeFees: coverStripeFees ? "true" : "false",
         chargedAmountUsd: (chargedAmountCents / 100).toFixed(2),
         ...(noteRaw ? { guestNote: noteRaw.slice(0, 400) } : {}),
@@ -129,7 +133,7 @@ export async function POST(request: NextRequest) {
       amount_usd: amountNum,
       charged_amount_usd: chargedAmountCents / 100,
       cover_stripe_fees: coverStripeFees,
-      note: noteRaw || null,
+      note: storedNote || null,
       payment_channel: "stripe",
       venmo_recipient: null,
       stripe_checkout_session_id: session.id,

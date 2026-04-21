@@ -22,11 +22,12 @@ function formatUsd(value: number) {
   }).format(value);
 }
 
-function venmoNoteForUrl(fund: RegistryFundId, guestNote: string) {
+function venmoNoteForUrl(fund: RegistryFundId, giverName: string, guestNote: string) {
   const label = registryFundLabel(fund);
   const base = `Wedding gift — ${label}`;
+  const from = giverName.trim() ? ` from ${giverName.trim()}` : "";
   const extra = guestNote.trim();
-  const combined = extra ? `${base}. ${extra}` : base;
+  const combined = extra ? `${base}${from}. ${extra}` : `${base}${from}`;
   return combined.slice(0, 200);
 }
 
@@ -44,6 +45,7 @@ export default function RegistryTab() {
   const [fund, setFund] = useState<RegistryFundId>("honeymoon");
   const selectedFund = useMemo(() => REGISTRY_FUNDS.find((f) => f.id === fund), [fund]);
   const [amount, setAmount] = useState<string>("");
+  const [giverName, setGiverName] = useState("");
   const [guestNote, setGuestNote] = useState("");
   const [coverStripeFees, setCoverStripeFees] = useState(false);
   const [website, setWebsite] = useState("");
@@ -71,6 +73,7 @@ export default function RegistryTab() {
         body: JSON.stringify({
           fund,
           amountUsd: baseAmount,
+          giverName: giverName.trim() || undefined,
           note: guestNote.trim() || undefined,
           paymentChannel: "venmo",
           venmoRecipient: link.id,
@@ -82,7 +85,7 @@ export default function RegistryTab() {
         setVenmoError(data.error ?? "Could not save your gift details.");
         return;
       }
-      const { appUrl, webUrl } = buildVenmoPaymentUrls(link.href, baseAmount, venmoNoteForUrl(fund, guestNote));
+      const { appUrl, webUrl } = buildVenmoPaymentUrls(link.href, baseAmount, venmoNoteForUrl(fund, giverName, guestNote));
       const isMobile = /android|iphone|ipad|ipod/i.test(navigator.userAgent);
 
       if (isMobile) {
@@ -121,6 +124,7 @@ export default function RegistryTab() {
         body: JSON.stringify({
           fund,
           amount: amountNum,
+          giverName: giverName.trim() || undefined,
           coverStripeFees,
           note: guestNote.trim() || undefined,
           website,
@@ -220,6 +224,20 @@ export default function RegistryTab() {
             </div>
 
             <div>
+              <label htmlFor="registry-giver-name" className="font-oldforge uppercase text-xs tracking-wider text-primary">
+                Your name (optional)
+              </label>
+              <input
+                id="registry-giver-name"
+                type="text"
+                value={giverName}
+                onChange={(e) => setGiverName(e.target.value.slice(0, 120))}
+                placeholder="How should we thank you?"
+                className="mt-2 w-full font-oldforge text-stone-800 border border-primary/20 bg-white/70 rounded-md px-4 py-3 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
+              />
+            </div>
+
+            <div>
               <label htmlFor="registry-note" className="font-oldforge uppercase text-xs tracking-wider text-primary">
                 Note (optional)
               </label>
@@ -268,6 +286,11 @@ export default function RegistryTab() {
                 <p>
                   <span className="font-semibold">Gift amount:</span> {formatUsd(baseAmount)}
                 </p>
+                {giverName.trim() ? (
+                  <p>
+                    <span className="font-semibold">From:</span> {giverName.trim()}
+                  </p>
+                ) : null}
                 <p>
                   <span className="font-semibold">Card charge (if selected):</span>{" "}
                   {formatUsd(coverStripeFees ? estimatedCharge : baseAmount)}

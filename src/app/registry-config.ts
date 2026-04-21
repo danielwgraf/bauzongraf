@@ -18,6 +18,17 @@ export function getVenmoLinks(): VenmoLink[] {
   return out;
 }
 
+function encodeQueryValue(value: string) {
+  // encodeURIComponent keeps spaces as %20 instead of '+'
+  // which Venmo displays more reliably in notes.
+  return encodeURIComponent(value);
+}
+
+function buildQueryString(params: Record<string, string | undefined>) {
+  const entries = Object.entries(params).filter(([, v]) => typeof v === "string" && v.length > 0);
+  return entries.map(([k, v]) => `${encodeQueryValue(k)}=${encodeQueryValue(v!)}`).join("&");
+}
+
 function venmoHandleFromProfileUrl(profileUrl: string) {
   try {
     const u = new URL(profileUrl);
@@ -37,10 +48,13 @@ function venmoHandleFromProfileUrl(profileUrl: string) {
  */
 export function buildVenmoPayUrl(profileUrl: string, amountUsd: number, note: string) {
   const u = new URL(profileUrl);
-  u.searchParams.set("txn", "pay");
-  u.searchParams.set("amount", amountUsd.toFixed(2));
   const trimmed = note.trim().slice(0, 200);
-  if (trimmed) u.searchParams.set("note", trimmed);
+  const query = buildQueryString({
+    txn: "pay",
+    amount: amountUsd.toFixed(2),
+    note: trimmed || undefined,
+  });
+  u.search = query;
   return u.toString();
 }
 
@@ -52,11 +66,13 @@ export function buildVenmoPaymentUrls(profileUrl: string, amountUsd: number, not
   const handle = venmoHandleFromProfileUrl(profileUrl);
   if (!handle) return { appUrl: webUrl, webUrl };
 
-  const app = new URL("venmo://paycharge");
-  app.searchParams.set("txn", "pay");
-  app.searchParams.set("recipients", handle);
-  app.searchParams.set("amount", amountUsd.toFixed(2));
   const trimmed = note.trim().slice(0, 200);
-  if (trimmed) app.searchParams.set("note", trimmed);
-  return { appUrl: app.toString(), webUrl };
+  const appQuery = buildQueryString({
+    txn: "pay",
+    recipients: handle,
+    amount: amountUsd.toFixed(2),
+    note: trimmed || undefined,
+  });
+  const appUrl = `venmo://paycharge?${appQuery}`;
+  return { appUrl, webUrl };
 }
