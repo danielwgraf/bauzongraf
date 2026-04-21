@@ -50,7 +50,7 @@ const FAQ_ITEMS: { question: string; answer: string }[] = [
   },
   {
     question: 'How long do I have to RSVP?',
-    answer: 'We kindly ask that all RSVPs be submitted by Date.\n\nUnfortunately, we will not be able to accommodate late responses. We truly appreciate your understanding, as these timelines allow us to finalize arrangements with our vendors.\n\nThank you for taking a moment to respond promptly—we are so looking forward to celebrating together.',
+    answer: 'We kindly ask that all RSVPs be submitted by 1st. August 2026.\n\nUnfortunately, we will not be able to accommodate late responses. We truly appreciate your understanding, as these timelines allow us to finalize arrangements with our vendors.\n\nThank you for taking a moment to respond promptly—we are so looking forward to celebrating together.',
   },
   {
     question: 'I have dietary restrictions. How do I let you know?',
