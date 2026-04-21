@@ -5,12 +5,6 @@ import { checkHoneypot, checkRateLimit, getClientIp, rateLimitResponse } from "@
 
 export async function POST(request: NextRequest) {
   const secretKey = process.env.STRIPE_SECRET_KEY;
-  const products = {
-    honeymoon: process.env.STRIPE_PRODUCT_HONEYMOON,
-    dogs: process.env.STRIPE_PRODUCT_DOGS,
-    donation: process.env.STRIPE_PRODUCT_DONATION,
-    castle: process.env.STRIPE_PRODUCT_CASTLE,
-  } as const;
 
   if (!secretKey) {
     return NextResponse.json(
@@ -23,6 +17,13 @@ export async function POST(request: NextRequest) {
 
   const stripe = new Stripe(secretKey);
 
+  const stripeProductByFund: Record<string, string | undefined> = {
+    honeymoon: process.env.STRIPE_PRODUCT_HONEYMOON,
+    dogs: process.env.STRIPE_PRODUCT_DOGS,
+    donation: process.env.STRIPE_PRODUCT_DONATION,
+    castle: process.env.STRIPE_PRODUCT_CASTLE,
+  };
+
   const origin =
     request.headers.get("origin") ??
     process.env.NEXT_PUBLIC_BASE_URL ??
@@ -31,7 +32,7 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = (await request.json().catch(() => ({}))) as {
-      fund?: keyof typeof products;
+      fund?: string;
       amount?: number | string;
       coverStripeFees?: boolean;
       note?: string;
@@ -55,7 +56,7 @@ export async function POST(request: NextRequest) {
 
     if (
       !fund ||
-      !["honeymoon", "dog", "donation", "castle"].includes(fund) ||
+      !["honeymoon", "dogs", "donation", "castle"].includes(fund) ||
       amountRaw === undefined
     ) {
       return NextResponse.json({ error: "Missing checkout info (fund and amount)." }, { status: 400 });
@@ -72,7 +73,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Minimum amount is $0.50." }, { status: 400 });
     }
 
-    const productId = products[fund];
+    const productId = stripeProductByFund[fund];
     if (!productId) {
       return NextResponse.json(
         { error: `Stripe product for fund '${fund}' is not configured.` },

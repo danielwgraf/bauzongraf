@@ -41,3 +41,8 @@ export function registryFundLabel(id: string) {
 export function registryFundDescription(id: string) {
   return REGISTRY_FUNDS.find((f) => f.id === id)?.description ?? "";
 }
+
+/** Funds the UI can submit (keeps APIs in sync when you comment funds in/out). */
+export function isValidRegistryFundId(id: string): id is RegistryFundId {
+  return REGISTRY_FUNDS.some((f) => f.id === id);
+}

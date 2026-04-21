@@ -51,7 +51,7 @@ as $$
 declare
   v_id uuid;
 begin
-  if p_fund is null or p_fund not in ('honeymoon', 'dog', 'donation', 'castle') then
+  if p_fund is null or p_fund not in ('honeymoon', 'dogs', 'donation', 'castle') then
     raise exception 'invalid fund';
   end if;
   if p_payment_channel is null or p_payment_channel not in ('venmo', 'stripe') then

@@ -68,7 +68,7 @@ export async function POST(request: NextRequest) {
   const note = typeof body.note === "string" ? body.note.trim().slice(0, 2000) : "";
   const coverStripeFees = Boolean(body.coverStripeFees);
 
-  if (!fund || !["honeymoon", "dog", "donation", "castle"].includes(fund)) {
+  if (!fund || !["honeymoon", "dogs", "donation", "castle"].includes(fund)) {
     return NextResponse.json({ error: "Invalid fund." }, { status: 400 });
   }
   if (paymentChannel !== "venmo") {
