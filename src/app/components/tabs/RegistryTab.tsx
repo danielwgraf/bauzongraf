@@ -43,7 +43,7 @@ export default function RegistryTab() {
   const venmoLinks = useMemo(() => getVenmoLinks(), []);
   const [fund, setFund] = useState<RegistryFundId>("honeymoon");
   const selectedFund = useMemo(() => REGISTRY_FUNDS.find((f) => f.id === fund), [fund]);
-  const [amount, setAmount] = useState<string>("75");
+  const [amount, setAmount] = useState<string>("");
   const [guestNote, setGuestNote] = useState("");
   const [coverStripeFees, setCoverStripeFees] = useState(false);
   const [website, setWebsite] = useState("");
@@ -202,6 +202,7 @@ export default function RegistryTab() {
                 min={0.5}
                 step={0.01}
                 value={amount}
+                placeholder="0.00"
                 onChange={(e) => setAmount(e.target.value)}
                 className="w-full font-oldforge text-stone-800 border border-primary/20 bg-white/70 rounded-md px-4 py-3 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
               />
