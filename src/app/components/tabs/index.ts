@@ -4,4 +4,5 @@ export { default as VenueTab } from './VenueTab';
 export { default as ScheduleTab } from './ScheduleTab';
 export { default as ThingsToDoTab } from './ThingsToDoTab';
 export { default as TravelTab } from './TravelTab';
+export { default as RegistryTab } from './RegistryTab';
 export { default as RsvpTab } from './RsvpTab';

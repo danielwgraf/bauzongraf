@@ -10,6 +10,7 @@ import {
   ScheduleTab,
   ThingsToDoTab,
   TravelTab,
+  RegistryTab,
   RsvpTab,
   FAQTab,
 } from './components/tabs';
@@ -22,6 +23,7 @@ const TAB_LABELS: Record<TabId, string> = {
   schedule: 'Schedule',
   'things-to-do': 'Things to Do',
   travel: 'Travel',
+  registry: 'Registry',
   rsvp: 'RSVP',
 };
 
@@ -234,6 +236,7 @@ function HomeContent() {
       {activeTab === 'schedule' && <ScheduleTab />}
       {activeTab === 'things-to-do' && <ThingsToDoTab />}
       {activeTab === 'travel' && <TravelTab />}
+      {activeTab === 'registry' && <RegistryTab />}
       {activeTab === 'faq' && <FAQTab />}
       {activeTab === 'rsvp' && (
         <RsvpTab

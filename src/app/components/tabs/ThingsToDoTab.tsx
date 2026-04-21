@@ -348,16 +348,16 @@ const CASTLES: ThingToDo[] = [
     websiteUrl: "https://chateau-beynac.com/?lang=en",
     websiteLabel: "Château de Beynac website",
   },
-  {
-    name: "Château de Reignac",
-    driveTime: "40 minutes",
-    description:
-      "Unusual “cliff castle” where the building merges with the rock—furnished Renaissance rooms and a terrace over the Vézère. Often quieter than the big Dordogne trio.",
-    address: "Château de Reignac, La Grande Filolie, 24620 Tursac, France",
-    imageSrc: "/images/locations/reignac.png",
-    websiteUrl: "https://reignac.com/en/",
-    websiteLabel: "Château de Reignac website",
-  },
+  // {
+  //   name: "Château de Reignac",
+  //   driveTime: "40 minutes",
+  //   description:
+  //     "Unusual “cliff castle” where the building merges with the rock—furnished Renaissance rooms and a terrace over the Vézère. Often quieter than the big Dordogne trio.",
+  //   address: "Château de Reignac, La Grande Filolie, 24620 Tursac, France",
+  //   imageSrc: "/images/locations/reignac.png",
+  //   websiteUrl: "https://reignac.com/en/",
+  //   websiteLabel: "Château de Reignac website",
+  // },
   {
     name: "Château de Losse",
     driveTime: "45 minutes",

@@ -1,4 +1,13 @@
-export const TABS = ['landing', 'venue', 'schedule', 'things-to-do', 'travel', 'faq', 'rsvp'] as const;
+export const TABS = [
+  'landing',
+  'venue',
+  'schedule',
+  'things-to-do',
+  'travel',
+  'registry',
+  'faq',
+  'rsvp',
+] as const;
 export type TabId = (typeof TABS)[number];
 
 export interface PartyMember {

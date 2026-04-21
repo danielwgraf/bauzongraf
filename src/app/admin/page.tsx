@@ -1,7 +1,9 @@
 'use client';
 
-import { useState, useEffect, FormEvent } from 'react';
+import { useState, useEffect, FormEvent, useMemo } from 'react';
 import { createClient } from '@supabase/supabase-js';
+import { DESSERT_OPTIONS, ENTREE_OPTIONS, MEAL_APPETIZER } from '../types';
+import { registryFundLabel } from '../registry-funds';
 
 // Initialize Supabase client
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
@@ -17,6 +19,10 @@ interface RSVP {
   email: string;
   is_attending: boolean;
   dietary_restrictions?: string | null;
+  entree_choice?: string | null;
+  dessert_choice?: string | null;
+  /** Stored on the first member row per party when anyone is attending */
+  accommodation?: string | null;
   created_at: string;
   updated_at?: string | null;
   // Legacy fields
@@ -57,12 +63,359 @@ interface PartyWithStatus extends Party {
   totalMembers: number;
   email?: string;
   lastUpdated?: string;
+  accommodation?: string | null;
+}
+
+function entreeLabel(id?: string | null) {
+  if (!id) return '—';
+  const opt = ENTREE_OPTIONS.find((o) => o.id === id);
+  return opt?.label ?? id;
+}
+
+function dessertLabel(id?: string | null) {
+  if (!id) return '—';
+  const opt = DESSERT_OPTIONS.find((o) => o.id === id);
+  return opt?.label ?? id;
+}
+
+function accommodationLabel(v?: string | null) {
+  if (v === 'chateau') return 'Château';
+  if (v === 'elsewhere') return 'Elsewhere';
+  return v ? v : '—';
+}
+
+type AdminView = 'guests' | 'summary' | 'registry';
+
+interface RegistryIntentRow {
+  id: string;
+  created_at: string;
+  fund: string;
+  amount_usd: number;
+  charged_amount_usd: number | null;
+  cover_stripe_fees: boolean;
+  note: string | null;
+  payment_channel: string;
+  venmo_recipient: string | null;
+  stripe_checkout_session_id: string | null;
+  status: string;
+}
+
+function formatRegistryMoney(n: number | null | undefined) {
+  if (n == null || Number.isNaN(Number(n))) return '—';
+  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(Number(n));
+}
+
+function venmoRecipientLabel(id: string | null) {
+  if (!id) return '—';
+  if (id === 'macy') return 'Macy';
+  if (id === 'daniel') return 'Daniel';
+  return id;
+}
+
+function RegistryIntentsPanel() {
+  const [rows, setRows] = useState<RegistryIntentRow[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
+        if (!session?.access_token) {
+          if (!cancelled) {
+            setError('Not signed in.');
+            setLoading(false);
+          }
+          return;
+        }
+        const res = await fetch('/api/registry-intents', {
+          headers: { Authorization: `Bearer ${session.access_token}` },
+        });
+        const json = (await res.json()) as { data?: RegistryIntentRow[]; error?: string };
+        if (!res.ok) {
+          if (!cancelled) setError(json.error ?? 'Failed to load registry gifts.');
+          return;
+        }
+        if (!cancelled) setRows(json.data ?? []);
+      } catch {
+        if (!cancelled) setError('Failed to load registry gifts.');
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="text-center py-10 text-stone-800">
+        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary mx-auto mb-3" />
+        <p className="font-medium">Loading registry…</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <p className="text-red-700 font-medium">
+        {error}{' '}
+        <span className="text-stone-600 font-normal text-sm">
+          (Run <code className="bg-stone-200 px-1 rounded text-xs">sql/registry_intents.sql</code> in Supabase if the
+          table is missing.)
+        </span>
+      </p>
+    );
+  }
+
+  if (rows.length === 0) {
+    return <p className="text-stone-700">No registry submissions yet.</p>;
+  }
+
+  return (
+    <div className="border-2 border-stone-200 rounded-lg overflow-hidden bg-white">
+      <div className="px-4 py-3 bg-stone-50 border-b border-stone-200">
+        <h3 className="text-lg font-bold text-primary">Registry gifts</h3>
+        <p className="text-xs text-stone-600 mt-1">
+          Logged when guests start Stripe checkout or open Venmo with your form. Payment completion for Venmo is not
+          tracked here.
+        </p>
+      </div>
+      <div className="overflow-x-auto">
+        <table className="w-full text-sm text-left">
+          <thead className="bg-stone-100 text-stone-800 font-semibold border-b border-stone-200">
+            <tr>
+              <th className="px-3 py-2">When</th>
+              <th className="px-3 py-2">Channel</th>
+              <th className="px-3 py-2">Fund</th>
+              <th className="px-3 py-2">Gift $</th>
+              <th className="px-3 py-2">Charged $</th>
+              <th className="px-3 py-2">Cover fees</th>
+              <th className="px-3 py-2">Venmo</th>
+              <th className="px-3 py-2">Stripe session</th>
+              <th className="px-3 py-2">Status</th>
+              <th className="px-3 py-2 min-w-[12rem]">Note</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((r) => (
+              <tr key={r.id} className="border-b border-stone-100 hover:bg-stone-50/80 align-top">
+                <td className="px-3 py-2 whitespace-nowrap text-stone-800">
+                  {new Date(r.created_at).toLocaleString()}
+                </td>
+                <td className="px-3 py-2 capitalize">{r.payment_channel}</td>
+                <td className="px-3 py-2">{registryFundLabel(r.fund)}</td>
+                <td className="px-3 py-2">{formatRegistryMoney(r.amount_usd)}</td>
+                <td className="px-3 py-2">{formatRegistryMoney(r.charged_amount_usd)}</td>
+                <td className="px-3 py-2">{r.cover_stripe_fees ? 'Yes' : 'No'}</td>
+                <td className="px-3 py-2">{venmoRecipientLabel(r.venmo_recipient)}</td>
+                <td className="px-3 py-2 font-mono text-xs max-w-[8rem] truncate" title={r.stripe_checkout_session_id ?? ''}>
+                  {r.stripe_checkout_session_id ?? '—'}
+                </td>
+                <td className="px-3 py-2 text-xs">{r.status}</td>
+                <td className="px-3 py-2 text-stone-700 whitespace-pre-wrap break-words">{r.note?.trim() || '—'}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+function incrementCount(map: Map<string, number>, key: string) {
+  map.set(key, (map.get(key) ?? 0) + 1);
+}
+
+function SummaryPanel({ parties }: { parties: PartyWithStatus[] }) {
+  const stats = useMemo(() => {
+    let totalInvitedMembers = 0;
+    let totalAttending = 0;
+    let totalNotAttending = 0;
+    let totalNoResponse = 0;
+    const entreeCounts = new Map<string, number>();
+    const dessertCounts = new Map<string, number>();
+    let chateauParties = 0;
+    let elsewhereParties = 0;
+    let unknownAccommParties = 0;
+
+    const attendingRows: {
+      party: PartyWithStatus;
+      member: PartyMember;
+      rsvp: RSVP;
+    }[] = [];
+
+    for (const p of parties) {
+      totalInvitedMembers += p.totalMembers;
+
+      for (const m of p.party_members) {
+        const rsvp = p.rsvps.find((r) => r.member_id === m.id);
+        if (!rsvp) {
+          totalNoResponse++;
+          continue;
+        }
+        if (rsvp.is_attending) {
+          totalAttending++;
+          incrementCount(entreeCounts, rsvp.entree_choice?.trim() ? rsvp.entree_choice : '—');
+          incrementCount(dessertCounts, rsvp.dessert_choice?.trim() ? rsvp.dessert_choice : '—');
+          attendingRows.push({ party: p, member: m, rsvp });
+        } else {
+          totalNotAttending++;
+        }
+      }
+
+      if (p.attendingCount > 0) {
+        if (p.accommodation === 'chateau') chateauParties++;
+        else if (p.accommodation === 'elsewhere') elsewhereParties++;
+        else unknownAccommParties++;
+      }
+    }
+
+    const entreeSorted = [...entreeCounts.entries()].sort((a, b) => b[1] - a[1]);
+    const dessertSorted = [...dessertCounts.entries()].sort((a, b) => b[1] - a[1]);
+
+    return {
+      totalInvitedMembers,
+      totalAttending,
+      totalNotAttending,
+      totalNoResponse,
+      entreeSorted,
+      dessertSorted,
+      chateauParties,
+      elsewhereParties,
+      unknownAccommParties,
+      attendingRows,
+    };
+  }, [parties]);
+
+  return (
+    <div className="space-y-8">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="border-2 border-stone-200 rounded-lg p-4 bg-white">
+          <p className="text-xs font-semibold text-stone-600 uppercase tracking-wide">Invited (people)</p>
+          <p className="text-3xl font-bold text-primary mt-1">{stats.totalInvitedMembers}</p>
+        </div>
+        <div className="border-2 border-green-200 rounded-lg p-4 bg-green-50">
+          <p className="text-xs font-semibold text-green-800 uppercase tracking-wide">Attending</p>
+          <p className="text-3xl font-bold text-green-900 mt-1">{stats.totalAttending}</p>
+        </div>
+        <div className="border-2 border-stone-200 rounded-lg p-4 bg-white">
+          <p className="text-xs font-semibold text-stone-600 uppercase tracking-wide">Not attending</p>
+          <p className="text-3xl font-bold text-stone-800 mt-1">{stats.totalNotAttending}</p>
+        </div>
+        <div className="border-2 border-amber-200 rounded-lg p-4 bg-amber-50">
+          <p className="text-xs font-semibold text-amber-900 uppercase tracking-wide">No response yet</p>
+          <p className="text-3xl font-bold text-amber-950 mt-1">{stats.totalNoResponse}</p>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="border-2 border-stone-200 rounded-lg p-5 bg-white">
+          <h3 className="text-lg font-bold text-primary mb-3">Entrées (attending)</h3>
+          <p className="text-xs text-stone-600 mb-3">Appetizer for everyone: {MEAL_APPETIZER}</p>
+          {stats.entreeSorted.length === 0 ? (
+            <p className="text-sm text-stone-600">No entrée selections yet.</p>
+          ) : (
+            <ul className="space-y-2">
+              {stats.entreeSorted.map(([id, count]) => (
+                <li key={id} className="flex justify-between gap-4 text-sm border-b border-stone-100 pb-2">
+                  <span className="text-stone-800 flex-1">{entreeLabel(id === '—' ? null : id)}</span>
+                  <span className="font-bold text-primary shrink-0">{count}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+        <div className="border-2 border-stone-200 rounded-lg p-5 bg-white">
+          <h3 className="text-lg font-bold text-primary mb-3">Desserts (attending)</h3>
+          {stats.dessertSorted.length === 0 ? (
+            <p className="text-sm text-stone-600">No dessert selections yet.</p>
+          ) : (
+            <ul className="space-y-2">
+              {stats.dessertSorted.map(([id, count]) => (
+                <li key={id} className="flex justify-between gap-4 text-sm border-b border-stone-100 pb-2">
+                  <span className="text-stone-800 flex-1">{dessertLabel(id === '—' ? null : id)}</span>
+                  <span className="font-bold text-primary shrink-0">{count}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      </div>
+
+      <div className="border-2 border-stone-200 rounded-lg p-5 bg-white">
+        <h3 className="text-lg font-bold text-primary mb-3">Accommodation (parties with ≥1 attending)</h3>
+        <div className="flex flex-wrap gap-6 text-sm">
+          <div>
+            <span className="font-semibold text-stone-700">Château:</span>{' '}
+            <span className="text-green-800 font-bold">{stats.chateauParties}</span>
+          </div>
+          <div>
+            <span className="font-semibold text-stone-700">Elsewhere:</span>{' '}
+            <span className="text-blue-800 font-bold">{stats.elsewhereParties}</span>
+          </div>
+          <div>
+            <span className="font-semibold text-stone-700">Not set / N/A:</span>{' '}
+            <span className="text-amber-800 font-bold">{stats.unknownAccommParties}</span>
+          </div>
+        </div>
+      </div>
+
+      <div className="border-2 border-stone-200 rounded-lg overflow-hidden bg-white">
+        <div className="px-5 py-4 border-b-2 border-stone-200 bg-stone-50">
+          <h3 className="text-lg font-bold text-primary">Attending guest roster &amp; meals</h3>
+          <p className="text-xs text-stone-600 mt-1">All guests who RSVP&apos;d yes, with meal choices.</p>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm text-left">
+            <thead className="bg-stone-100 text-stone-800 font-semibold border-b border-stone-200">
+              <tr>
+                <th className="px-4 py-3">Party</th>
+                <th className="px-4 py-3">Guest</th>
+                <th className="px-4 py-3">Entrée</th>
+                <th className="px-4 py-3">Dessert</th>
+                <th className="px-4 py-3">Dietary</th>
+                <th className="px-4 py-3">Accommodation</th>
+              </tr>
+            </thead>
+            <tbody>
+              {stats.attendingRows.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="px-4 py-6 text-stone-600 text-center">
+                    No attending guests yet.
+                  </td>
+                </tr>
+              ) : (
+                stats.attendingRows.map(({ party, member, rsvp }) => (
+                  <tr key={`${party.id}-${member.id}`} className="border-b border-stone-100 hover:bg-stone-50/80">
+                    <td className="px-4 py-3 font-medium text-primary">{party.last_name}</td>
+                    <td className="px-4 py-3">
+                      {member.first_name} {member.last_name}
+                    </td>
+                    <td className="px-4 py-3 text-stone-800 max-w-xs">{entreeLabel(rsvp.entree_choice)}</td>
+                    <td className="px-4 py-3 text-stone-800 max-w-xs">{dessertLabel(rsvp.dessert_choice)}</td>
+                    <td className="px-4 py-3 text-stone-700">{rsvp.dietary_restrictions?.trim() || '—'}</td>
+                    <td className="px-4 py-3 text-stone-700">{accommodationLabel(party.accommodation)}</td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 function RSVPList() {
   const [parties, setParties] = useState<PartyWithStatus[]>([]);
   const [rsvps, setRsvps] = useState<RSVP[]>([]);
   const [loading, setLoading] = useState(true);
+  const [adminView, setAdminView] = useState<AdminView>('guests');
   const [expandedHistory, setExpandedHistory] = useState<Record<string, boolean>>({});
   const [historyData, setHistoryData] = useState<Record<string, HistoryEntry[]>>({});
 
@@ -110,6 +463,9 @@ function RSVPList() {
                 }, null)
               : undefined;
 
+            const accommodation =
+              partyRsvps.find((r: RSVP) => r.accommodation != null && r.accommodation !== '')?.accommodation ?? null;
+
             return {
               ...party,
               rsvps: partyRsvps,
@@ -119,6 +475,7 @@ function RSVPList() {
               totalMembers: party.party_members.length,
               email: partyRsvps[0]?.email,
               lastUpdated,
+              accommodation,
             };
           });
 
@@ -187,7 +544,51 @@ function RSVPList() {
           Sign Out
         </button>
       </div>
-      {parties.length > 0 ? (
+
+      <div className="flex flex-wrap gap-2 mb-6">
+        <button
+          type="button"
+          onClick={() => setAdminView('guests')}
+          className={`px-4 py-2 rounded-lg font-semibold text-sm transition-colors ${
+            adminView === 'guests'
+              ? 'bg-primary text-white'
+              : 'bg-white text-stone-800 border-2 border-stone-200 hover:border-primary/40'
+          }`}
+        >
+          By party
+        </button>
+        <button
+          type="button"
+          onClick={() => setAdminView('summary')}
+          className={`px-4 py-2 rounded-lg font-semibold text-sm transition-colors ${
+            adminView === 'summary'
+              ? 'bg-primary text-white'
+              : 'bg-white text-stone-800 border-2 border-stone-200 hover:border-primary/40'
+          }`}
+        >
+          Summary
+        </button>
+        <button
+          type="button"
+          onClick={() => setAdminView('registry')}
+          className={`px-4 py-2 rounded-lg font-semibold text-sm transition-colors ${
+            adminView === 'registry'
+              ? 'bg-primary text-white'
+              : 'bg-white text-stone-800 border-2 border-stone-200 hover:border-primary/40'
+          }`}
+        >
+          Registry
+        </button>
+      </div>
+
+      {adminView === 'registry' ? <RegistryIntentsPanel /> : null}
+
+      {adminView === 'summary' && parties.length > 0 ? <SummaryPanel parties={parties} /> : null}
+      {adminView === 'summary' && parties.length === 0 ? (
+        <p className="text-stone-700">No party data to summarize.</p>
+      ) : null}
+
+      {parties.length > 0 && adminView === 'guests' ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {parties.map((party) => {
           const partyKey = party.id;
@@ -268,6 +669,12 @@ function RSVPList() {
                               <span className="text-stone-900">{party.email}</span>
                             </div>
                           )}
+                          {party.attendingCount > 0 && (
+                            <div>
+                              <span className="font-semibold text-stone-700">Accommodation:</span>{' '}
+                              <span className="text-stone-900">{accommodationLabel(party.accommodation)}</span>
+                            </div>
+                          )}
                         </>
                       )}
                     </div>
@@ -313,6 +720,15 @@ function RSVPList() {
                                   {entry.previous_values.dietary_restrictions && (
                                     <p>• Dietary: {entry.previous_values.dietary_restrictions}</p>
                                   )}
+                                  {entry.previous_values.entree_choice != null && entry.previous_values.entree_choice !== '' && (
+                                    <p>• Entrée: {entreeLabel(entry.previous_values.entree_choice)}</p>
+                                  )}
+                                  {entry.previous_values.dessert_choice != null && entry.previous_values.dessert_choice !== '' && (
+                                    <p>• Dessert: {dessertLabel(entry.previous_values.dessert_choice)}</p>
+                                  )}
+                                  {entry.previous_values.accommodation != null && entry.previous_values.accommodation !== '' && (
+                                    <p>• Accommodation: {accommodationLabel(entry.previous_values.accommodation)}</p>
+                                  )}
                                 </div>
                               )}
                             </div>
@@ -351,6 +767,19 @@ function RSVPList() {
                                 </p>
                               </div>
                             )}
+                            {memberRsvp.is_attending && (
+                              <div className="mt-3 p-3 bg-white border border-stone-200 rounded-lg space-y-2">
+                                <p className="text-sm text-stone-900">
+                                  <span className="font-bold">Appetizer:</span> {MEAL_APPETIZER}
+                                </p>
+                                <p className="text-sm text-stone-900">
+                                  <span className="font-bold">Entrée:</span> {entreeLabel(memberRsvp.entree_choice)}
+                                </p>
+                                <p className="text-sm text-stone-900">
+                                  <span className="font-bold">Dessert:</span> {dessertLabel(memberRsvp.dessert_choice)}
+                                </p>
+                              </div>
+                            )}
                           </>
                         ) : (
                           <p className="text-sm text-stone-600 italic">No response submitted</p>
@@ -369,14 +798,14 @@ function RSVPList() {
             );
           })}
         </div>
-      ) : (
+      ) : adminView === 'guests' ? (
         <div className="text-center py-10">
           <p className="text-stone-800 text-lg font-semibold mb-2">No parties found.</p>
           <p className="text-sm text-stone-700">
             Make sure you have imported your invite list into the database.
           </p>
         </div>
-      )}
+      ) : null}
     </div>
   );
 }
