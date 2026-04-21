@@ -77,6 +77,9 @@ export async function POST(request: NextRequest) {
   if (paymentChannel !== "venmo") {
     return NextResponse.json({ error: "Use Stripe checkout for card payments." }, { status: 400 });
   }
+  if (!giverName) {
+    return NextResponse.json({ error: "Name is required." }, { status: 400 });
+  }
   const amountNum = typeof amountRaw === "string" ? Number(amountRaw) : amountRaw;
   if (amountNum === undefined || !Number.isFinite(amountNum) || amountNum < 0.5) {
     return NextResponse.json({ error: "Amount must be at least $0.50." }, { status: 400 });

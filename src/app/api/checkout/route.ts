@@ -64,6 +64,9 @@ export async function POST(request: NextRequest) {
     ) {
       return NextResponse.json({ error: "Missing checkout info (fund and amount)." }, { status: 400 });
     }
+    if (!giverName) {
+      return NextResponse.json({ error: "Name is required." }, { status: 400 });
+    }
 
     const amountNum = typeof amountRaw === "string" ? Number(amountRaw) : amountRaw;
     if (!Number.isFinite(amountNum) || amountNum <= 0) {

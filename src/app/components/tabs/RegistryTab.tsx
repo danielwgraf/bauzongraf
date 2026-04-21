@@ -22,6 +22,20 @@ function formatUsd(value: number) {
   }).format(value);
 }
 
+function stripAmountDecorators(raw: string) {
+  return raw.replace(/[$,\s]/g, "");
+}
+
+/** Allow typing digits and a single decimal point. */
+function sanitizeAmountTyping(raw: string) {
+  let v = stripAmountDecorators(raw).replace(/[^0-9.]/g, "");
+  const firstDot = v.indexOf(".");
+  if (firstDot !== -1) {
+    v = v.slice(0, firstDot + 1) + v.slice(firstDot + 1).replace(/\./g, "");
+  }
+  return v;
+}
+
 function venmoNoteForUrl(fund: RegistryFundId, giverName: string, guestNote: string) {
   const label = registryFundLabel(fund);
   const base = `Wedding gift — ${label}`;
@@ -50,17 +64,22 @@ export default function RegistryTab() {
   const [coverStripeFees, setCoverStripeFees] = useState(false);
   const [website, setWebsite] = useState("");
 
-  const amountNum = Number(amount);
+  const amountNum = Number(stripAmountDecorators(amount));
   const amountIsValid = Number.isFinite(amountNum) && amountNum >= 0.5;
   const baseAmount = amountIsValid ? amountNum : 0;
   const estimatedCharge = coverStripeFees
     ? (baseAmount + STRIPE_FEE_FIXED_USD_ESTIMATE) / (1 - STRIPE_FEE_PERCENT_ESTIMATE)
     : baseAmount;
   const estimatedFee = Math.max(0, estimatedCharge - baseAmount);
-  const canContinue = amountIsValid;
+  const giverNameTrimmed = giverName.trim();
+  const canContinue = amountIsValid && giverNameTrimmed.length > 0;
 
   const openVenmo = async (link: VenmoLink) => {
     setVenmoError("");
+    if (!giverNameTrimmed) {
+      setVenmoError("Please enter your name before paying with Venmo.");
+      return;
+    }
     if (!amountIsValid) {
       setVenmoError("Enter a valid amount (minimum $0.50) before paying with Venmo.");
       return;
@@ -73,7 +92,7 @@ export default function RegistryTab() {
         body: JSON.stringify({
           fund,
           amountUsd: baseAmount,
-          giverName: giverName.trim() || undefined,
+          giverName: giverNameTrimmed,
           note: guestNote.trim() || undefined,
           paymentChannel: "venmo",
           venmoRecipient: link.id,
@@ -85,7 +104,11 @@ export default function RegistryTab() {
         setVenmoError(data.error ?? "Could not save your gift details.");
         return;
       }
-      const { appUrl, webUrl } = buildVenmoPaymentUrls(link.href, baseAmount, venmoNoteForUrl(fund, giverName, guestNote));
+      const { appUrl, webUrl } = buildVenmoPaymentUrls(
+        link.href,
+        baseAmount,
+        venmoNoteForUrl(fund, giverNameTrimmed, guestNote)
+      );
       const isMobile = /android|iphone|ipad|ipod/i.test(navigator.userAgent);
 
       if (isMobile) {
@@ -108,6 +131,10 @@ export default function RegistryTab() {
     setStripeLoading(true);
     setStripeError("");
     try {
+      if (!giverNameTrimmed) {
+        setStripeError("Please enter your name.");
+        return;
+      }
       if (!Number.isFinite(amountNum) || amountNum <= 0) {
         setStripeError("Please enter a valid amount in USD.");
         return;
@@ -124,7 +151,7 @@ export default function RegistryTab() {
         body: JSON.stringify({
           fund,
           amount: amountNum,
-          giverName: giverName.trim() || undefined,
+          giverName: giverNameTrimmed,
           coverStripeFees,
           note: guestNote.trim() || undefined,
           website,
@@ -169,8 +196,10 @@ export default function RegistryTab() {
         ) : null}
 
         <p className="font-oldforge text-lg text-stone-800 leading-relaxed mb-6">
-          Your presence is the greatest gift. We made this quick: first enter your gift details, then choose how you want
-          to pay.
+        Your presence at our wedding is truly the greatest gift we could ask for, and we are so grateful that you are making the journey to celebrate with us. For this reason, we have chosen not to create a traditional registry, and gifts are certainly not expected.
+        <br />
+        <br />
+        For those who have kindly expressed interest in making a contribution, we have included an optional fund here on our website. Please know that your love, support, and presence at our celebration mean the world to us.
         </p>
         <p className="font-oldforge text-sm text-stone-600 mb-8">Step {step} of 2</p>
 
@@ -209,32 +238,57 @@ export default function RegistryTab() {
             </div>
 
             <div>
-              <p className="font-oldforge uppercase text-xs tracking-wider text-primary mb-2">Amount (USD)</p>
-              <input
-                inputMode="decimal"
-                type="number"
-                min={0.5}
-                step={0.01}
-                value={amount}
-                placeholder="0.00"
-                onChange={(e) => setAmount(e.target.value)}
-                className="w-full font-oldforge text-stone-800 border border-primary/20 bg-white/70 rounded-md px-4 py-3 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
-              />
-              <p className="font-oldforge text-stone-600 text-xs mt-2">Minimum $0.50</p>
+              <label htmlFor="registry-amount" className="font-oldforge uppercase text-xs tracking-wider text-primary mb-2 block">
+                Amount (USD)
+              </label>
+              <div className="relative">
+                <span
+                  className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 font-oldforge text-stone-600 select-none"
+                  aria-hidden
+                >
+                  $
+                </span>
+                <input
+                  id="registry-amount"
+                  inputMode="decimal"
+                  type="text"
+                  autoComplete="off"
+                  value={amount}
+                  placeholder="0.00"
+                  onChange={(e) => setAmount(sanitizeAmountTyping(e.target.value))}
+                  onBlur={() => {
+                    const raw = stripAmountDecorators(amount).trim();
+                    if (!raw) {
+                      setAmount("");
+                      return;
+                    }
+                    const n = Number(raw);
+                    if (!Number.isFinite(n)) {
+                      setAmount("");
+                      return;
+                    }
+                    setAmount(n.toFixed(2));
+                  }}
+                  className="w-full font-oldforge text-stone-800 border border-primary/20 bg-white/70 rounded-md pl-8 pr-4 py-3 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
+                />
+              </div>
+              {/* <p className="font-oldforge text-stone-600 text-xs mt-2">Minimum $0.50</p> */}
             </div>
 
             <div>
               <label htmlFor="registry-giver-name" className="font-oldforge uppercase text-xs tracking-wider text-primary">
-                Your name (optional)
+                Your name
               </label>
               <input
                 id="registry-giver-name"
                 type="text"
                 value={giverName}
                 onChange={(e) => setGiverName(e.target.value.slice(0, 120))}
-                placeholder="How should we thank you?"
+                placeholder="Name?"
+                required
                 className="mt-2 w-full font-oldforge text-stone-800 border border-primary/20 bg-white/70 rounded-md px-4 py-3 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
               />
+              <p className="font-oldforge text-stone-600 text-xs mt-2">Required</p>
             </div>
 
             <div>
