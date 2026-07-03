@@ -1,5 +1,8 @@
+'use client';
+
+import { useTranslations } from 'next-intl';
 import type { InviteParty, MemberRSVP } from '../../types';
-import { MEAL_APPETIZER, ENTREE_OPTIONS, DESSERT_OPTIONS } from '../../types';
+import { ENTREE_OPTIONS, DESSERT_OPTIONS } from '../../types';
 
 interface RsvpTabProps {
   lastName: string;
@@ -42,33 +45,34 @@ export default function RsvpTab({
   onSubmit,
   onReset,
 }: RsvpTabProps) {
+  const t = useTranslations('RSVP');
+  const tMeals = useTranslations('Meals');
+
   const attendingCount = party?.members.filter((member) => memberRsvps[member.id]?.isAttending).length ?? 0;
   const anyAttending = attendingCount > 0;
-  const accommodationSubject = attendingCount > 1 ? 'We' : 'I';
 
   return (
     <main className="min-h-dvh bg-secondary px-4 pt-24 pb-16">
       <div className="mx-auto max-w-2xl">
         {submitted ? (
           <div className="text-center space-y-4">
-            <h2 className="font-parochus-original text-3xl text-primary mb-4">Thank You!</h2>
+            <h2 className="font-parochus-original text-3xl text-primary mb-4">{t('thankYou')}</h2>
             <p className="font-cormorant text-lg text-stone-800">
-              Your RSVP has been {isUpdate ? 'updated' : 'submitted'} successfully.
+              {t(isUpdate ? 'updatedSuccess' : 'submittedSuccess')}
             </p>
             <button
               onClick={onReset}
               className="bg-primary text-white px-6 py-3 rounded hover:bg-primary/90 transition-colors font-sans"
             >
-              {isUpdate ? 'Update Again' : 'Submit Another RSVP'}
+              {t(isUpdate ? 'updateAgain' : 'submitAnother')}
             </button>
           </div>
         ) : matchingParties.length > 0 ? (
           <div className="space-y-6">
             <div className="text-center">
-              <h2 className="font-parochus-original text-3xl text-primary mb-2">Multiple Parties Found</h2>
+              <h2 className="font-parochus-original text-3xl text-primary mb-2">{t('multiplePartiesTitle')}</h2>
               <p className="font-cormorant text-lg text-stone-800 mb-6">
-                We found {matchingParties.length} {matchingParties.length === 1 ? 'party' : 'parties'} with the last name &quot;{lastName}&quot;.
-                Please select which party you belong to:
+                {t('multiplePartiesMessage', { count: matchingParties.length, lastName })}
               </p>
             </div>
             <div className="space-y-4">
@@ -79,15 +83,15 @@ export default function RsvpTab({
                   className="w-full font-oldforge text-left border-2 border-stone-300 rounded-lg p-4 hover:border-primary hover:bg-white transition-colors bg-white"
                 >
                   <div className="font-semibold text-lg text-primary mb-2">
-                    {matchingParty.lastName} Party
+                    {t('partyName', { lastName: matchingParty.lastName })}
                   </div>
                   <div className="text-sm text-stone-700">
                     <p className="mb-1">
-                      <span className="font-medium">Members:</span>{' '}
+                      <span className="font-medium">{t('membersLabel')}</span>{' '}
                       {matchingParty.members.map(m => `${m.firstName} ${m.lastName}`).join(', ')}
                     </p>
                     <p className="text-stone-600">
-                      {matchingParty.members.length} {matchingParty.members.length === 1 ? 'person' : 'people'}
+                      {t('memberCount', { count: matchingParty.members.length })}
                     </p>
                   </div>
                 </button>
@@ -97,17 +101,17 @@ export default function RsvpTab({
               onClick={onReset}
               className="w-full text-center text-stone-600 hover:text-primary font-medium"
             >
-              Try a different last name
+              {t('tryDifferentName')}
             </button>
           </div>
         ) : !party ? (
           <div className="text-center space-y-4">
-            <h2 className="font-parochus-original text-3xl text-primary mb-6">RSVP</h2>
-            <p className="font-oldforge text-lg text-stone-800 mb-6">Please enter your last name to find your invitation.</p>
+            <h2 className="font-parochus-original text-3xl text-primary mb-6">{t('title')}</h2>
+            <p className="font-oldforge text-lg text-stone-800 mb-6">{t('enterLastNamePrompt')}</p>
             <form onSubmit={onLastNameLookup} className="space-y-4">
               <input
                 type="text"
-                placeholder="Enter your last name"
+                placeholder={t('enterLastNamePlaceholder')}
                 value={lastName}
                 onChange={(e) => setLastName(e.target.value)}
                 required
@@ -121,33 +125,33 @@ export default function RsvpTab({
                 disabled={loading}
                 className="bg-primary font-oldforge uppercase text-white px-6 py-3 rounded hover:bg-primary/90 transition-colors disabled:opacity-50 w-full font-sans"
               >
-                {loading ? 'Looking up...' : 'Find My Invitation'}
+                {t(loading ? 'lookingUp' : 'findInvitation')}
               </button>
             </form>
           </div>
         ) : (
           <div className="space-y-6">
             <div className="text-center">
-              <h2 className="font-parochus-original text-3xl text-primary mb-2">RSVP for {party.lastName} Party</h2>
+              <h2 className="font-parochus-original text-3xl text-primary mb-2">{t('rsvpForParty', { lastName: party.lastName })}</h2>
               {isUpdate ? (
                 <div className="bg-amber-50/80 border border-amber-200 rounded-lg p-3 mb-4">
                   <p className="text-amber-900 font-oldforge font-medium">
-                    You have an existing RSVP. Update your responses below.
+                    {t('existingRsvpNotice')}
                   </p>
                 </div>
               ) : (
-                <p className="font-oldforge text-lg text-stone-700">Please respond for each person in your party</p>
+                <p className="font-oldforge text-lg text-stone-700">{t('respondForParty')}</p>
               )}
             </div>
             <form onSubmit={onSubmit} className="space-y-6">
               <div>
                 <label htmlFor="email" className="block text-sm font-oldforge font-medium mb-2 text-stone-800">
-                  Contact Email
+                  {t('contactEmail')}
                 </label>
                 <input
                   id="email"
                   type="email"
-                  placeholder="your.email@example.com"
+                  placeholder={t('emailPlaceholder')}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -156,7 +160,7 @@ export default function RsvpTab({
               </div>
 
               <div className="space-y-6">
-                <h3 className="font-oldforge uppercase text-xl text-primary">Party Members</h3>
+                <h3 className="font-oldforge uppercase text-xl text-primary">{t('partyMembers')}</h3>
                 {party.members.map((member) => (
                   <div key={member.id} className="border border-stone-200 rounded-lg p-4 space-y-4 bg-white">
                     <h4 className="font-sans font-oldforge text-lg font-semibold text-primary">
@@ -172,14 +176,14 @@ export default function RsvpTab({
                           }
                           className="w-5 h-5 rounded border-stone-300 text-primary"
                         />
-                        <span>Will be attending</span>
+                        <span>{t('willAttend')}</span>
                       </label>
                       {memberRsvps[member.id]?.isAttending && (
                         <>
                           <div className="space-y-4">
-                            <p className="text-sm font-oldforge text-stone-600 italic">Starter: {MEAL_APPETIZER}</p>
+                            <p className="text-sm font-oldforge text-stone-600 italic">{t('starter', { appetizer: tMeals('appetizer') })}</p>
                             <div>
-                              <p className="text-sm font-oldforge font-medium mb-2 text-stone-800">Entrée (choose one) <span className="text-primary">*</span></p>
+                              <p className="text-sm font-oldforge font-medium mb-2 text-stone-800">{t('entreeChoose')} <span className="text-primary">*</span></p>
                               <div className="space-y-2" role="group" aria-required="true">
                                 {ENTREE_OPTIONS.map((option) => (
                                   <label key={option.id} className="flex font-oldforge items-start gap-2 text-stone-800 cursor-pointer">
@@ -192,14 +196,14 @@ export default function RsvpTab({
                                       required
                                       className="w-4 h-4 mt-0.5 border-stone-300 text-primary"
                                     />
-                                    <span className="text-sm">{option.label}</span>
+                                    <span className="text-sm">{tMeals('entree_' + option.id)}</span>
                                   </label>
                                 ))}
                               </div>
                             </div>
-                            <p className="text-sm font-oldforge text-stone-600 italic">Cheese course</p>
+                            <p className="text-sm font-oldforge text-stone-600 italic">{t('cheeseCourse')}</p>
                             <div>
-                              <p className="text-sm font-oldforge font-medium mb-2 text-stone-800">Dessert (choose one) <span className="text-primary">*</span></p>
+                              <p className="text-sm font-oldforge font-medium mb-2 text-stone-800">{t('dessertChoose')} <span className="text-primary">*</span></p>
                               <div className="space-y-2" role="group" aria-required="true">
                                 {DESSERT_OPTIONS.map((option) => (
                                   <label key={option.id} className="flex font-oldforge items-start gap-2 text-stone-800 cursor-pointer">
@@ -212,7 +216,7 @@ export default function RsvpTab({
                                       required
                                       className="w-4 h-4 mt-0.5 border-stone-300 text-primary"
                                     />
-                                    <span className="text-sm">{option.label}</span>
+                                    <span className="text-sm">{tMeals('dessert_' + option.id)}</span>
                                   </label>
                                 ))}
                               </div>
@@ -220,11 +224,11 @@ export default function RsvpTab({
                           </div>
                           <div>
                             <label htmlFor={`dietary-${member.id}`} className="block font-oldforge text-sm font-medium mb-2 text-stone-800">
-                              Dietary Restrictions (optional)
+                              {t('dietaryLabel')}
                             </label>
                             <textarea
                               id={`dietary-${member.id}`}
-                              placeholder="e.g., Vegetarian, Gluten-free, Allergies..."
+                              placeholder={t('dietaryPlaceholder')}
                               value={memberRsvps[member.id]?.dietaryRestrictions || ''}
                               onChange={(e) =>
                                 onMemberRsvpChange(member.id, 'dietaryRestrictions', e.target.value)
@@ -242,7 +246,7 @@ export default function RsvpTab({
 
               {anyAttending && (
                 <div>
-                  <p className="text-sm font-oldforge font-medium mb-2 text-stone-800">Accommodation</p>
+                  <p className="text-sm font-oldforge font-medium mb-2 text-stone-800">{t('accommodationLabel')}</p>
                   <div className="space-y-2">
                     <label className="flex font-oldforge items-center gap-2 text-stone-800 cursor-pointer">
                       <input
@@ -253,7 +257,7 @@ export default function RsvpTab({
                         onChange={() => setAccommodation('chateau')}
                         className="w-4 h-4 border-stone-300 font-oldforge text-primary"
                       />
-                      <span>{accommodationSubject} will be staying at the Château</span>
+                      <span>{t('accommodationChateau', { count: attendingCount })}</span>
                     </label>
                     <label className="flex font-oldforge items-center gap-2 text-stone-800 cursor-pointer">
                       <input
@@ -264,7 +268,7 @@ export default function RsvpTab({
                         onChange={() => setAccommodation('elsewhere')}
                         className="w-4 h-4 font-oldforge border-stone-300 text-primary"
                       />
-                      <span>{accommodationSubject} plan on arranging {accommodationSubject === 'We' ? 'our' : 'my'} own accommodation elsewhere</span>
+                      <span>{t('accommodationElsewhere', { count: attendingCount })}</span>
                     </label>
                   </div>
                 </div>
@@ -280,14 +284,14 @@ export default function RsvpTab({
                   onClick={onReset}
                   className="flex-1 border border-stone-300 text-stone-700 px-6 py-3 rounded hover:bg-white bg-white font-sans transition-colors"
                 >
-                  Start Over
+                  {t('startOver')}
                 </button>
                 <button
                   type="submit"
                   disabled={loading}
                   className="flex-1 bg-primary text-white px-6 py-3 rounded hover:bg-primary/90 transition-colors disabled:opacity-50 font-sans"
                 >
-                  {loading ? (isUpdate ? 'Updating...' : 'Submitting...') : (isUpdate ? 'Update RSVP' : 'Submit RSVP')}
+                  {t(loading ? (isUpdate ? 'updating' : 'submitting') : (isUpdate ? 'updateRsvp' : 'submitRsvp'))}
                 </button>
               </div>
             </form>

@@ -1,0 +1,332 @@
+{
+  "Tabs": {
+    "faq": "FAQ",
+    "landing": "Startseite",
+    "venue": "Location",
+    "schedule": "Programm",
+    "things-to-do": "Ausflugsziele",
+    "travel": "Anreise",
+    "registry": "Geschenke",
+    "rsvp": "Zusage"
+  },
+  "Nav": {
+    "openMenu": "Menü öffnen",
+    "closeMenu": "Menü schließen",
+    "mainNavigation": "Hauptnavigation",
+    "menuLabel": "Menü",
+    "monogramAlt": "Macy & Daniel"
+  },
+  "Landing": {
+    "dearestFamilyFriends": "LIEBSTE FAMILIE & FREUNDE",
+    "requestPresence": "BITTEN UM EURE ANWESENHEIT",
+    "celebrateMarriage": "UM IHRE HOCHZEIT ZU FEIERN",
+    "requestPresenceFull": "BITTEN UM EURE ANWESENHEIT, UM IHRE HOCHZEIT ZU FEIERN",
+    "when": "Wann",
+    "where": "Wo",
+    "weddingDate": "3. Oktober 2026",
+    "venueName": "Château de Lacoste",
+    "venueLocation": "Castelnaud-la-Chapelle, Frankreich",
+    "venueShort": "Château de Lacoste · Castelnaud-la-Chapelle, Frankreich",
+    "openInvitation": "Einladung öffnen",
+    "open": "Öffnen",
+    "details": "Details",
+    "summary": "Übersicht",
+    "saveYourSeat": "Platz reservieren"
+  },
+  "Venue": {
+    "sectionTitle": "Die Location",
+    "heading": "Château de Lacoste",
+    "description1": "Das Château de Lacoste steht in Castelnaud-la-Chapelle, im Périgord Noir, oberhalb des Dordogne-Tals — einer Landschaft, die seit langem von mittelalterlichen Festungen und Flussdörfern geprägt ist. Das Haus erhielt seine heutige Form im 18. Jahrhundert, als klassische Symmetrie und formale Planung auf einen älteren Standort aufgebaut wurden, und hinterließ ein Herrenhaus, das eindeutig als Produkt jener Epoche zu erkennen ist: Kalksteinmauern, geordnete Fassaden und Gärten in französischer Tradition angelegt, mit Buchsbaum und Rosen, die noch immer die Außenräume zwischen dem Haus und dem Hang definieren.",
+    "description2": "Das Anwesen erstreckt sich über mehrere Hektar Parkland; eine kleine Kapelle und spätere Anbauten gehören zur gleichen Nutzungskontinuität — zunächst als Familiensitz, heute als ein Ort, an dem das Gefüge des Gebäudes und des Landes noch immer die Geschichte erzählt, wie Menschen hier über Jahrhunderte lebten und arbeiteten.",
+    "visitLink": "Château de Lacoste besuchen"
+  },
+  "Schedule": {
+    "sectionTitle": "Das Wochenende",
+    "heading": "Programm",
+    "intro": "Wir können es kaum erwarten, mit euch im Château de Lacoste zu feiern. Hier ist, was wir von Donnerstag bis Sonntag geplant haben.",
+    "thursdayDate": "Donnerstag, 1. Oktober",
+    "thursdayEvent": "Willkommensabendessen",
+    "fridayDate": "Freitag, 2. Oktober",
+    "fridayEvent": "Probeabendessen",
+    "saturdayDate": "Samstag, 3. Oktober",
+    "saturdayEvent": "Trauung & Hochzeitsfeier",
+    "sundayDate": "Sonntag, 4. Oktober",
+    "sundayEvent": "Abschiedsbrunch",
+    "note": "Uhrzeiten und weitere Details werden näher am Datum mitgeteilt."
+  },
+  "Travel": {
+    "sectionTitle": "Anreise",
+    "heading": "Anreise & Wegbeschreibung",
+    "intro": "Das Château de Lacoste befindet sich in Castelnaud-la-Chapelle, im Herzen des Périgord Noir. Hier sind einige Möglichkeiten, dorthin zu gelangen.",
+    "suggestedAirports": "Empfohlene Flughäfen",
+    "bordeauxName": "Bordeaux–Mérignac (BOD)",
+    "bordeauxDescription": "Etwa 2 Stunden mit dem Auto. Gute internationale Verbindungen und eine unkomplizierte Fahrt nach Osten ins Dordogne-Tal.",
+    "toulouseName": "Toulouse–Blagnac (TLS)",
+    "toulouseDescription": "Etwa 2 Stunden mit dem Auto. Nordwärts zur Dordogne; eine weitere gute Option, wenn ihr bessere Flüge findet.",
+    "parisName": "Paris (CDG / Orly)",
+    "parisDescription": "Etwa 5–6 Stunden mit dem Auto oder TGV nach Bordeaux und dann mit dem Auto. Am besten, wenn ihr bereits in Paris seid oder eine längere Reise plant.",
+    "byCarTitle": "Mit dem Auto",
+    "byCarDescription": "Castelnaud-la-Chapelle ist am einfachsten mit dem Auto zu erreichen. Von Bordeaux oder Toulouse folgt den Schildern zum Dordogne-Tal; das Château befindet sich in Castelnaud-la-Chapelle. Die genaue Adresse und Parkdetails werden näher am Datum mitgeteilt.",
+    "byCarNote": "Wenn ihr ein Auto mieten möchtet, empfehlen wir eine frühzeitige Buchung für Oktober. Die Straßen rund um die Dordogne sind malerisch und gut ausgebaut."
+  },
+  "ThingsToDo": {
+    "sectionTitle": "Während eures Aufenthalts",
+    "heading": "Ausflugsziele",
+    "intro": "Fahrtzeiten sind ungefähre Angaben ab Château de Lacoste. Tippt auf einen Ort für vollständige Details, Routenkarte und Links.",
+    "swipeHint": "Karten nach links/rechts wischen",
+    "detailsLink": "Details, Karte & Wegbeschreibung",
+    "back": "Zurück",
+    "directionsFromChateau": "Wegbeschreibung vom Château",
+    "website": "Webseite",
+    "fromChateau": "Vom Château de Lacoste: ",
+    "driveTimeBy": "ca. {driveTime} mit dem Auto",
+    "drivingDirectionsNote": "Die Wegbeschreibung unten ist ab Château de Lacoste.",
+    "addressLabel": "Adresse",
+    "routeLabel": "Route vom Château de Lacoste",
+    "routeDescription": "Vorschau der Fahrroute vom Hochzeitsort. Google Maps öffnen für die vollständige Navigation.",
+    "mapIframeTitle": "Wegbeschreibung vom Château de Lacoste nach {name}",
+    "categories": {
+      "castles": "Schlösser & Burgen",
+      "geoHistory": "Geographische & historische Stätten",
+      "villages": "Dörfer",
+      "restaurants": "Lokale Restaurants & Boulangerie"
+    },
+    "places": {
+      "chateauCastelnaud": {
+        "name": "Château de Castelnaud",
+        "driveTime": "7 Minuten",
+        "description": "Eine mittelalterliche Festung über der Dordogne, mit Waffen- und Kriegssammlungen und weitem Blick über den Fluss und Beynac. Eines der meistbesuchten Schlösser der Region.",
+        "websiteLabel": "Château de Castelnaud Webseite"
+      },
+      "chateauMillandes": {
+        "name": "Château des Milandes",
+        "driveTime": "9 Minuten",
+        "description": "Renaissance-Herrensitz, berühmt als Heimat von Josephine Baker — historische Räume, Gärten und tägliche Greifvogel-Shows. Ein sanfterer, geschichtenreicher Kontrast zu rein militärischen Burgen.",
+        "websiteLabel": "Château des Milandes Webseite"
+      },
+      "chateauBeynac": {
+        "name": "Château de Beynac",
+        "driveTime": "13 Minuten",
+        "description": "Dramatische Klippenborg gegenüber von Castelnaud auf der anderen Talseite. Weitgehend originale Steininterieurs und steile Aufstiege — eine der am besten erhaltenen feudalen Festungen im Périgord.",
+        "websiteLabel": "Château de Beynac Webseite"
+      },
+      "chateauLosse": {
+        "name": "Château de Losse",
+        "driveTime": "45 Minuten",
+        "description": "Befestigtes Haus mit einem berühmten formalen Garten zwischen Wehranlagen und Wald, auf den Klippen über der Vézère. Guter Halt in Kombination mit Lascaux oder Saint-Léon.",
+        "websiteLabel": "Château de Losse Beschreibung"
+      },
+      "lascaux": {
+        "name": "Lascaux (Lascaux IV)",
+        "driveTime": "45 Minuten",
+        "description": "Weltberühmte prähistorische Kunst — besucht das Lascaux IV Interpretationszentrum für maßstabsgetreue Repliken und Kontext (die Originalhöhle ist für die Öffentlichkeit geschlossen). In der Saison zeitgebundene Tickets buchen.",
+        "websiteLabel": "Lascaux Webseite"
+      },
+      "roqueSaintChristophe": {
+        "name": "Roque Saint-Christophe",
+        "driveTime": "45 Minuten",
+        "description": "Eine Meile Kalksteinklippe, ausgehöhlt zu Terrassen und Behausungen, genutzt von der Vorgeschichte bis ins Mittelalter. Stege und Ausblicke über die Vézère.",
+        "websiteLabel": "Roque Saint-Christophe Webseite"
+      },
+      "gouffreDePadirac": {
+        "name": "Gouffre de Padirac",
+        "driveTime": "1 Stunde 20 Minuten",
+        "description": "Riesiger Erdfall mit einem unterirdischen Fluss — per Aufzug oder Treppe hinabsteigen, dann Boot durch beleuchtete Höhlen. Ein ganzer Tagesausflug; im Sommer sehr beliebt (vorher reservieren).",
+        "websiteLabel": "Gouffre de Padirac Webseite"
+      },
+      "domme": {
+        "name": "Domme",
+        "driveTime": "18 Minuten",
+        "description": "Bastide auf einem Hochplateau mit einem großen Hauptplatz, Höhleneingängen unter dem Dorf und Aussichtspunkten über die Dordogne-Schleifen. Gut für einen Spaziergang, Eis und Fotos.",
+        "websiteLabel": "Dorfbeschreibung"
+      },
+      "laRoqueGageac": {
+        "name": "La Roque-Gageac",
+        "driveTime": "10 Minuten",
+        "description": "Steinhäuser unter Klippen am Fluss — oft unter Frankreichs schönsten Dörfern gelistet. Gabarren (Flussboote) starten in der Saison vom Kai.",
+        "websiteLabel": "Dorfbeschreibung"
+      },
+      "sarlat": {
+        "name": "Sarlat-la-Canéda",
+        "driveTime": "20 Minuten",
+        "description": "Die mittelalterliche Vorzeigstadt der Region — goldene Steingassen, Samstagsmarkt, Geschäfte und Restaurants. Ideal für einen halben Tag Bummeln und Leute-Beobachten.",
+        "websiteLabel": "Dorfbeschreibung"
+      },
+      "saintAmandDeColy": {
+        "name": "Saint-Amand-de-Coly",
+        "driveTime": "40 Minuten",
+        "description": "Kleines Dorf, dominiert von einer befestigten Abteikirche im Vézère-Tal. Ruhig und atmosphärisch, schön in Kombination mit Montignac oder Lascaux.",
+        "websiteLabel": "Dorfbeschreibung"
+      },
+      "turenne": {
+        "name": "Turenne",
+        "driveTime": "1 Stunde 10 Minuten",
+        "description": "Hügeldorf in der Corrèze mit Kopfsteinpflastergassen und den Ruinen eines großen Burgfrieds — weite Ausblicke über die Landschaft. Ruhiger als Sarlat.",
+        "websiteLabel": "Dorfbeschreibung"
+      },
+      "rocamadour": {
+        "name": "Rocamadour",
+        "driveTime": "1 Stunde 10 Minuten",
+        "description": "An die Klippen geschmiegte Pilgerstadt: Kapellen, Burg und die Schwarze Madonna, dazu Touristenläden und Käse. Früh oder spät ankommen, um Stoßzeiten zu vermeiden.",
+        "websiteLabel": "Dorfbeschreibung"
+      },
+      "collongesLaRouge": {
+        "name": "Collonges-la-Rouge",
+        "driveTime": "1 Stunde 20 Minuten",
+        "description": "Dorf fast vollständig aus rotem Sandstein gebaut — Gassen, Türme und kleine Gärten. Eines der Plus Beaux Villages; kompakter Besuch von ein bis zwei Stunden.",
+        "websiteLabel": "Dorfbeschreibung"
+      },
+      "laSource": {
+        "name": "La Source",
+        "driveTime": "",
+        "description": "Traditionelle Périgord-Küche in Dorfnähe — Terrasse, regionale Gerichte und ein entspanntes lokales Flair. Praktisch nach einem Besuch von Castelnaud.",
+        "websiteLabel": "Restaurant auf TripAdvisor"
+      },
+      "chezJosephine": {
+        "name": "Chez Josephine",
+        "driveTime": "",
+        "description": "Uferrestaurant im \"Guinguette\"-Stil an der Dordogne mit Verandablick — zwanglose Gerichte, Getränke am Wasser und eine lebhafte Sommeratmosphäre.",
+        "websiteLabel": "Restaurant-Webseite"
+      },
+      "lesMachicoulis": {
+        "name": "Les Machicoulis",
+        "driveTime": "",
+        "description": "Restaurant (und Zimmer) im Herzen von Castelnaud — Terrasse mit Blick über das Tal zur Burg. Pizzen, Salate und regionale Optionen; Reservierung in der Hochsaison empfohlen.",
+        "websiteLabel": "Restaurant auf TripAdvisor"
+      },
+      "maisonCarre": {
+        "name": "Maison Carré",
+        "driveTime": "",
+        "description": "Beliebte lokale Boulangerie-Pâtisserie für Brot, Feingebäck, Sandwiches und Süßes — ideal für Picknickvorräte oder Frühstück vor einem Ausflugstag.",
+        "websiteLabel": "Restaurant auf TripAdvisor"
+      }
+    }
+  },
+  "FAQ": {
+    "sectionTitle": "HÄUFIGE FRAGEN",
+    "heading": "Häufig gestellte Fragen",
+    "accommodations_q": "Wie sind die Unterkünfte?",
+    "accommodations_a": "Als Zeichen unserer Dankbarkeit für eure Reise nach Frankreich, um mit uns zu feiern, freuen wir uns, unseren Gästen während der Hochzeitsfeierlichkeiten eine Unterkunft im Château anbieten zu können.\n\nDie Zimmer sind charmant und historisch. Da das Château aus dem 18. Jahrhundert stammt, sind Platz und Badezimmer jedoch etwas begrenzt. Einige Gäste werden die Unterkünfte als gemütlich empfinden, und die Zimmer variieren in Größe und Aufteilung — wie es in historischen Häusern oft der Fall ist.\n\nSolltet ihr mehr Platz oder zusätzliche Privatsphäre bevorzugen, seid ihr natürlich herzlich willkommen, eure eigene Unterkunft in der Nähe zu organisieren.\n\nWir sind so dankbar, dass ihr die Reise auf euch nehmt, um mit uns zu feiern, und können es kaum erwarten, diesen besonderen Ort gemeinsam zu erleben.\n\n**Check-in ist am Donnerstag, dem 1. Oktober um 17:00 Uhr. Check-out ist am Sonntag, dem 4. Oktober um 12:00 Uhr.**",
+    "dressCode_q": "Gibt es einen Dresscode?",
+    "dressCode_a": "**Willkommensabendessen**\n\nDas Willkommensabendessen ist zwanglos. Wir hoffen, dass ihr die Zeit nutzt, um euch einzuleben und euch von der Reise zu erholen.\n\n**Trauung & Empfang**\n\nUnsere Feier findet in einem Château statt, nur wenige Minuten von einem kleinen mittelalterlichen Dorf im Dordogne-Tal entfernt. Der Abend wird in kreativem Black-Tie-Stil gehalten. Wir laden unsere Gäste ein, den romantischen und einzigartigen Geist des Ortes aufzunehmen.\n\nDer Dresscode ist Creative Black Tie — formelle (aber farbenfrohe) Abendgarderobe wird begrüßt. Smoking und bodenlange Abendkleider wären großartige Optionen.\n\nDie Feierlichkeiten finden im Freien statt, daher sollten Gäste ihre Schuhwahl entsprechend bedenken. Da der Oktober in Frankreich kühl sein kann, empfehlen wir, einen Schal, Mantel oder andere Lagen für den Abend mitzubringen.\n\nVor allem hoffen wir, dass ihr die Gelegenheit genießt, euch für den Anlass zu kleiden und mit uns in einer Umgebung zu feiern, die unvergesslich zu werden verspricht.\n\n**Abschiedsbrunch**\n\nDer Brunch ist zwanglos, und wir hoffen, dass ihr die Zeit nutzt, um den Morgen zu genießen und euch auf die Heimreise vorzubereiten.",
+    "indoorsOutdoors_q": "Findet die Feier drinnen oder draußen statt?",
+    "indoorsOutdoors_a": "Wenn das Wetter es erlaubt, werden die Trauung und der Empfang im Freien stattfinden.",
+    "extraGuests_q": "Kann ich weitere Gäste mitbringen?",
+    "extraGuests_a": "Wir verstehen, dass die Reise nach Frankreich eine bedeutende Unternehmung ist, und viele Gäste möglicherweise zusammen mit Freunden oder Familie reisen. Um unsere Feier intim zu halten — und aufgrund der begrenzten Kapazitäten im Château — ist die Teilnahme an den Hochzeitsveranstaltungen auf die Personen beschränkt, deren Namen auf der Einladung stehen.\n\nGäste sind selbstverständlich herzlich willkommen, alternative Unterkünfte zu organisieren, wenn sie es vorziehen, während des Wochenendes bei ihren Reisebegleitern zu bleiben.\n\nWir sind wirklich dankbar für den Aufwand, den es erfordert, um mit uns zu feiern, und wir freuen uns darauf, bei einer anderen Gelegenheit mit denen zu feiern, die nicht dabei sein können.",
+    "rsvpDeadline_q": "Bis wann muss ich zusagen?",
+    "rsvpDeadline_a": "Wir bitten euch herzlich, alle Zusagen bis zum 1. August 2026 einzureichen.\n\nLeider können wir verspätete Rückmeldungen nicht berücksichtigen. Wir schätzen euer Verständnis sehr, da uns diese Fristen ermöglichen, die Arrangements mit unseren Dienstleistern abzuschließen.\n\nVielen Dank, dass ihr euch einen Moment Zeit nehmt, um zeitnah zu antworten — wir freuen uns so sehr darauf, gemeinsam zu feiern.",
+    "dietary_q": "Ich habe Ernährungseinschränkungen. Wie teile ich das mit?",
+    "dietary_a": "Bitte gebt bei eurer Zusage eventuelle Ernährungseinschränkungen an. Wir geben sie an den Caterer weiter, damit wir uns um euch kümmern können.",
+    "registry_q": "Wo seid ihr registriert?",
+    "registry_a": "Eure Anwesenheit bei unserer Hochzeit ist wirklich das größte Geschenk, das wir uns wünschen können, und wir sind so dankbar, dass ihr die Reise auf euch nehmt, um mit uns zu feiern. Aus diesem Grund haben wir uns entschieden, keine traditionelle Geschenkliste zu erstellen, und Geschenke sind keinesfalls erwartet.\n\nFür diejenigen, die freundlicherweise Interesse an einem Beitrag bekundet haben, haben wir einen optionalen Fonds auf unserer Website eingerichtet. Bitte wisst, dass eure Liebe, Unterstützung und Anwesenheit bei unserer Feier uns unendlich viel bedeuten."
+  },
+  "RSVP": {
+    "thankYou": "Vielen Dank!",
+    "submittedSuccess": "Eure Zusage wurde erfolgreich übermittelt.",
+    "updatedSuccess": "Eure Zusage wurde erfolgreich aktualisiert.",
+    "submitAnother": "Weitere Zusage absenden",
+    "updateAgain": "Erneut aktualisieren",
+    "multiplePartiesTitle": "Mehrere Gruppen gefunden",
+    "multiplePartiesMessage": "Wir haben {count, plural, one {# Gruppe} other {# Gruppen}} mit dem Nachnamen \"{lastName}\" gefunden. Bitte wählt eure Gruppe aus:",
+    "partyName": "Gruppe {lastName}",
+    "membersLabel": "Mitglieder:",
+    "memberCount": "{count, plural, one {# Person} other {# Personen}}",
+    "tryDifferentName": "Anderen Nachnamen versuchen",
+    "title": "Zusage",
+    "rsvpForParty": "Zusage für Gruppe {lastName}",
+    "enterLastNamePrompt": "Bitte gebt euren Nachnamen ein, um eure Einladung zu finden.",
+    "enterLastNamePlaceholder": "Nachnamen eingeben",
+    "lookingUp": "Suche läuft...",
+    "findInvitation": "Einladung finden",
+    "existingRsvpNotice": "Ihr habt bereits zugesagt. Aktualisiert eure Antworten unten.",
+    "respondForParty": "Bitte antwortet für jede Person in eurer Gruppe",
+    "contactEmail": "Kontakt-E-Mail",
+    "emailPlaceholder": "eure.email@beispiel.de",
+    "partyMembers": "Gruppenmitglieder",
+    "willAttend": "Wird teilnehmen",
+    "starter": "Vorspeise: {appetizer}",
+    "entreeChoose": "Hauptgang (bitte wählen)",
+    "cheeseCourse": "Käsegang",
+    "dessertChoose": "Dessert (bitte wählen)",
+    "dietaryLabel": "Ernährungseinschränkungen (optional)",
+    "dietaryPlaceholder": "z.B. Vegetarisch, Glutenfrei, Allergien...",
+    "accommodationLabel": "Unterkunft",
+    "accommodationChateau": "{count, plural, =1 {Ich werde im Château übernachten} other {Wir werden im Château übernachten}}",
+    "accommodationElsewhere": "{count, plural, =1 {Ich plane, meine eigene Unterkunft anderswo zu organisieren} other {Wir planen, unsere eigene Unterkunft anderswo zu organisieren}}",
+    "startOver": "Neu beginnen",
+    "submitRsvp": "Zusage absenden",
+    "updateRsvp": "Zusage aktualisieren",
+    "submitting": "Wird gesendet...",
+    "updating": "Wird aktualisiert..."
+  },
+  "Registry": {
+    "sectionTitle": "Geschenke",
+    "heading": "Geschenke & Beiträge",
+    "checkoutSuccess": "Vielen Dank — eure Zahlung ist eingegangen. Wir sind sehr dankbar für eure Großzügigkeit.",
+    "checkoutCancel": "Der Bezahlvorgang wurde abgebrochen. Kein Problem — ihr könnt es jederzeit erneut versuchen.",
+    "intro1": "Eure Anwesenheit bei unserer Hochzeit ist wirklich das größte Geschenk, das wir uns wünschen können, und wir sind so dankbar, dass ihr die Reise auf euch nehmt, um mit uns zu feiern. Aus diesem Grund haben wir uns entschieden, keine traditionelle Geschenkliste zu erstellen, und Geschenke sind keinesfalls erwartet.",
+    "intro2": "Für diejenigen, die freundlicherweise Interesse an einem Beitrag bekundet haben, haben wir einen optionalen Fonds hier auf unserer Website eingerichtet. Bitte wisst, dass eure Liebe, Unterstützung und Anwesenheit bei unserer Feier uns unendlich viel bedeuten.",
+    "stepOf": "Schritt {step} von 2",
+    "fundLabel": "Fonds",
+    "amountLabel": "Betrag (USD)",
+    "yourNameLabel": "Euer Name",
+    "yourNamePlaceholder": "Name?",
+    "requiredHint": "Pflichtfeld",
+    "noteLabel": "Nachricht (optional)",
+    "notePlaceholder": "Eine kurze Nachricht für Macy & Daniel…",
+    "continueToPayment": "Weiter zur Zahlung",
+    "giftSummary": "Geschenkübersicht",
+    "fundSummaryLabel": "Fonds:",
+    "giftAmountLabel": "Geschenkbetrag:",
+    "fromLabel": "Von:",
+    "cardChargeLabel": "Kartenbelastung (falls gewählt):",
+    "includesFees": "(beinhaltet ca. {fee} geschätzte Gebühren)",
+    "noteDisplayLabel": "Nachricht:",
+    "editDetails": "Details bearbeiten",
+    "paymentMethod": "Zahlungsmethode",
+    "venmo": "Venmo",
+    "cardStripe": "Karte (Stripe)",
+    "coverStripeFees": "Stripe-Gebühren übernehmen",
+    "coverStripeFeesDesc": "Wir addieren einen geschätzten Betrag, damit die Bearbeitungsgebühren abgedeckt sind.",
+    "saving": "Wird gespeichert…",
+    "venmoNotReady": "Venmo-Details werden in Kürze hier angezeigt.",
+    "errorNameVenmo": "Bitte gebt euren Namen ein, bevor ihr mit Venmo bezahlt.",
+    "errorAmountVenmo": "Bitte gebt einen gültigen Betrag (mindestens $0,50) ein, bevor ihr mit Venmo bezahlt.",
+    "errorCouldNotSave": "Eure Geschenkdaten konnten nicht gespeichert werden.",
+    "errorGeneric": "Etwas ist schiefgelaufen. Bitte versucht es erneut.",
+    "errorNameStripe": "Bitte gebt euren Namen ein.",
+    "errorAmountStripe": "Bitte gebt einen gültigen Betrag in USD ein.",
+    "errorMinAmount": "Mindestbetrag ist $0,50.",
+    "errorCheckoutFailed": "Der Bezahlvorgang konnte nicht gestartet werden.",
+    "errorNoCheckoutUrl": "Keine Checkout-URL erhalten.",
+    "openingCheckout": "Bezahlvorgang wird geöffnet…",
+    "payWithCard": "Mit Karte bezahlen",
+    "payAmountWithCard": "{amount} mit Karte bezahlen",
+    "funds": {
+      "honeymoon": {
+        "label": "Flitterwochen",
+        "description": "Nach der Hochzeit werden wir eine Reise nach Irland unternehmen, um unsere Flitterwochen zu feiern. Geschenke hier gehen an Flüge, Hotels und andere Reisekosten."
+      },
+      "dogs": {
+        "label": "Hunde",
+        "description": "Fuji und Corby sind sauer, dass wir sie in Amerika gelassen haben, anstatt sie mit nach Frankreich zu nehmen. Geschenke hier gehen an Leckerlis, Pflege und den unvermeidlichen Schmolltrip, den sie uns bei unserer Rückkehr bereiten werden."
+      }
+    }
+  },
+  "Meals": {
+    "appetizer": "Melonen-Gazpacho mit Monbazillac",
+    "entree_veal": "Gegrilltes Kalbssteak mit kräftiger Rosmarin-Knoblauch-Confit-Jus und Karottenmousseline",
+    "entree_poultry": "Bauernhof-Geflügelsuprême mit Morchelsauce und confierten Fingerlingkartoffeln",
+    "entree_vegetarian": "Vegetarische Option (folgt)",
+    "dessert_chocolate": "Knuspriges Schokoladen-Entremet",
+    "dessert_apple": "\"Apfel-Illusion\" (Trompe-l'œil), Vanille-Ganache und Apfel-Walnuss-Zimt-Kompott"
+  },
+  "Errors": {
+    "noInvite": "Keine passende Einladung gefunden. Bitte überprüft euren Nachnamen und versucht es erneut.",
+    "generic": "Ein Fehler ist aufgetreten. Bitte versucht es erneut.",
+    "submitFailed": "Zusage konnte nicht übermittelt werden. Bitte versucht es erneut.",
+    "accommodationRequired": "Bitte wählt eure Unterkunftspräferenz.",
+    "chooseEntree": "{name}: Bitte wählt einen Hauptgang.",
+    "chooseDessert": "{name}: Bitte wählt ein Dessert."
+  }
+}

@@ -2,11 +2,11 @@
 
 import { useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { buildVenmoPaymentUrls, getVenmoLinks, type VenmoLink } from "../../registry-config";
 import {
   REGISTRY_FUNDS,
   type RegistryFundId,
-  registryFundDescription,
   registryFundLabel,
 } from "../../registry-funds";
 
@@ -46,6 +46,7 @@ function venmoNoteForUrl(fund: RegistryFundId, giverName: string, guestNote: str
 }
 
 export default function RegistryTab() {
+  const t = useTranslations("Registry");
   const searchParams = useSearchParams();
   const checkoutFlag = searchParams.get("checkout");
   const [step, setStep] = useState<1 | 2>(1);
@@ -77,11 +78,11 @@ export default function RegistryTab() {
   const openVenmo = async (link: VenmoLink) => {
     setVenmoError("");
     if (!giverNameTrimmed) {
-      setVenmoError("Please enter your name before paying with Venmo.");
+      setVenmoError(t("errorNameVenmo"));
       return;
     }
     if (!amountIsValid) {
-      setVenmoError("Enter a valid amount (minimum $0.50) before paying with Venmo.");
+      setVenmoError(t("errorAmountVenmo"));
       return;
     }
     setVenmoSaving(true);
@@ -101,7 +102,7 @@ export default function RegistryTab() {
       });
       const data = (await res.json()) as { error?: string };
       if (!res.ok) {
-        setVenmoError(data.error ?? "Could not save your gift details.");
+        setVenmoError(data.error ?? t("errorCouldNotSave"));
         return;
       }
       const { appUrl, webUrl } = buildVenmoPaymentUrls(
@@ -112,7 +113,6 @@ export default function RegistryTab() {
       const isMobile = /android|iphone|ipad|ipod/i.test(navigator.userAgent);
 
       if (isMobile) {
-        // Prefer app deep link on mobile, then fall back to web profile if app is unavailable.
         window.location.href = appUrl;
         window.setTimeout(() => {
           window.location.href = webUrl;
@@ -121,7 +121,7 @@ export default function RegistryTab() {
         window.open(webUrl, "_blank", "noopener,noreferrer");
       }
     } catch {
-      setVenmoError("Something went wrong. Please try again.");
+      setVenmoError(t("errorGeneric"));
     } finally {
       setVenmoSaving(false);
     }
@@ -132,16 +132,16 @@ export default function RegistryTab() {
     setStripeError("");
     try {
       if (!giverNameTrimmed) {
-        setStripeError("Please enter your name.");
+        setStripeError(t("errorNameStripe"));
         return;
       }
       if (!Number.isFinite(amountNum) || amountNum <= 0) {
-        setStripeError("Please enter a valid amount in USD.");
+        setStripeError(t("errorAmountStripe"));
         return;
       }
 
       if (amountNum < 0.5) {
-        setStripeError("Minimum amount is $0.50.");
+        setStripeError(t("errorMinAmount"));
         return;
       }
 
@@ -159,16 +159,16 @@ export default function RegistryTab() {
       });
       const data = (await res.json()) as { url?: string; error?: string };
       if (!res.ok) {
-        setStripeError(data.error ?? "Could not start checkout.");
+        setStripeError(data.error ?? t("errorCheckoutFailed"));
         return;
       }
       if (data.url) {
         window.location.href = data.url;
         return;
       }
-      setStripeError("No checkout URL returned.");
+      setStripeError(t("errorNoCheckoutUrl"));
     } catch {
-      setStripeError("Something went wrong. Please try again.");
+      setStripeError(t("errorGeneric"));
     } finally {
       setStripeLoading(false);
     }
@@ -177,8 +177,8 @@ export default function RegistryTab() {
   return (
     <section className="min-h-dvh pt-24 pb-16 px-4 bg-secondary">
       <div className="max-w-3xl mx-auto">
-        <p className="font-oldforge uppercase text-2xl text-primary mb-2">Registry</p>
-        <h2 className="font-parochus-original text-4xl md:text-5xl text-primary mb-6">Gifts &amp; Contributions</h2>
+        <p className="font-oldforge uppercase text-2xl text-primary mb-2">{t("sectionTitle")}</p>
+        <h2 className="font-parochus-original text-4xl md:text-5xl text-primary mb-6">{t("heading")}</h2>
         <div className="w-24 h-[1px] bg-primary mb-10" />
 
         {checkoutFlag === "success" ? (
@@ -186,27 +186,27 @@ export default function RegistryTab() {
             className="font-oldforge text-stone-800 bg-white/60 border border-primary/20 rounded-xl px-4 py-3 mb-8"
             role="status"
           >
-            Thank you — your payment went through. We&apos;re so grateful for your generosity.
+            {t("checkoutSuccess")}
           </p>
         ) : null}
         {checkoutFlag === "cancel" ? (
           <p className="font-oldforge text-stone-600 bg-stone-100/80 border border-stone-200 rounded-xl px-4 py-3 mb-8">
-            Checkout was cancelled. No worries — you can try again whenever you like.
+            {t("checkoutCancel")}
           </p>
         ) : null}
 
         <p className="font-oldforge text-lg text-stone-800 leading-relaxed mb-6">
-        Your presence at our wedding is truly the greatest gift we could ask for, and we are so grateful that you are making the journey to celebrate with us. For this reason, we have chosen not to create a traditional registry, and gifts are certainly not expected.
+        {t("intro1")}
         <br />
         <br />
-        For those who have kindly expressed interest in making a contribution, we have included an optional fund here on our website. Please know that your love, support, and presence at our celebration mean the world to us.
+        {t("intro2")}
         </p>
-        <p className="font-oldforge text-sm text-stone-600 mb-8">Step {step} of 2</p>
+        <p className="font-oldforge text-sm text-stone-600 mb-8">{t("stepOf", { step })}</p>
 
         {step === 1 ? (
           <div className="rounded-xl border border-primary/20 bg-white/50 p-5 md:p-6 space-y-6 mb-10">
             <div>
-              <p className="font-oldforge uppercase text-xs tracking-wider text-primary mb-2">Fund</p>
+              <p className="font-oldforge uppercase text-xs tracking-wider text-primary mb-2">{t("fundLabel")}</p>
               <div className="flex flex-wrap gap-2" role="group" aria-label="Choose a gift fund">
                 {REGISTRY_FUNDS.map((f) => (
                   <button
@@ -221,7 +221,7 @@ export default function RegistryTab() {
                     aria-pressed={fund === f.id}
                     aria-describedby="registry-fund-description"
                   >
-                    {f.label}
+                    {t(`funds.${f.id}.label`)}
                   </button>
                 ))}
               </div>
@@ -232,14 +232,14 @@ export default function RegistryTab() {
                   role="region"
                   aria-live="polite"
                 >
-                  {selectedFund.description}
+                  {t(`funds.${selectedFund.id}.description`)}
                 </p>
               ) : null}
             </div>
 
             <div>
               <label htmlFor="registry-amount" className="font-oldforge uppercase text-xs tracking-wider text-primary mb-2 block">
-                Amount (USD)
+                {t("amountLabel")}
               </label>
               <div className="relative">
                 <span
@@ -277,30 +277,30 @@ export default function RegistryTab() {
 
             <div>
               <label htmlFor="registry-giver-name" className="font-oldforge uppercase text-xs tracking-wider text-primary">
-                Your name
+                {t("yourNameLabel")}
               </label>
               <input
                 id="registry-giver-name"
                 type="text"
                 value={giverName}
                 onChange={(e) => setGiverName(e.target.value.slice(0, 120))}
-                placeholder="Name?"
+                placeholder={t("yourNamePlaceholder")}
                 required
                 className="mt-2 w-full font-oldforge text-stone-800 border border-primary/20 bg-white/70 rounded-md px-4 py-3 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
               />
-              <p className="font-oldforge text-stone-600 text-xs mt-2">Required</p>
+              <p className="font-oldforge text-stone-600 text-xs mt-2">{t("requiredHint")}</p>
             </div>
 
             <div>
               <label htmlFor="registry-note" className="font-oldforge uppercase text-xs tracking-wider text-primary">
-                Note (optional)
+                {t("noteLabel")}
               </label>
               <textarea
                 id="registry-note"
                 rows={3}
                 value={guestNote}
                 onChange={(e) => setGuestNote(e.target.value.slice(0, 2000))}
-                placeholder="A short message for Macy & Daniel…"
+                placeholder={t("notePlaceholder")}
                 className="mt-2 w-full font-oldforge text-stone-800 border border-primary/20 bg-white/70 rounded-md px-4 py-3 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 resize-y min-h-[5rem]"
               />
             </div>
@@ -323,36 +323,36 @@ export default function RegistryTab() {
               disabled={!canContinue}
               className="font-oldforge uppercase border-2 border-primary bg-primary text-secondary px-5 py-3 rounded-md hover:brightness-110 transition-[filter] disabled:opacity-50 disabled:pointer-events-none"
             >
-              Continue to payment
+              {t("continueToPayment")}
             </button>
           </div>
         ) : (
           <div className="space-y-6 mb-10">
             <div className="rounded-xl border border-primary/20 bg-white/50 p-5 md:p-6">
-              <p className="font-oldforge text-xs uppercase tracking-wider text-primary mb-3">Gift summary</p>
+              <p className="font-oldforge text-xs uppercase tracking-wider text-primary mb-3">{t("giftSummary")}</p>
               <div className="space-y-1 font-oldforge text-sm text-stone-800">
                 <p>
-                  <span className="font-semibold">Fund:</span> {registryFundLabel(fund)}
+                  <span className="font-semibold">{t("fundSummaryLabel")}</span> {t(`funds.${fund}.label`)}
                 </p>
                 <p className="font-oldforge text-stone-600 text-sm leading-relaxed pt-1">
-                  {registryFundDescription(fund)}
+                  {t(`funds.${fund}.description`)}
                 </p>
                 <p>
-                  <span className="font-semibold">Gift amount:</span> {formatUsd(baseAmount)}
+                  <span className="font-semibold">{t("giftAmountLabel")}</span> {formatUsd(baseAmount)}
                 </p>
                 {giverName.trim() ? (
                   <p>
-                    <span className="font-semibold">From:</span> {giverName.trim()}
+                    <span className="font-semibold">{t("fromLabel")}</span> {giverName.trim()}
                   </p>
                 ) : null}
                 <p>
-                  <span className="font-semibold">Card charge (if selected):</span>{" "}
+                  <span className="font-semibold">{t("cardChargeLabel")}</span>{" "}
                   {formatUsd(coverStripeFees ? estimatedCharge : baseAmount)}
-                  {coverStripeFees ? ` (includes about ${formatUsd(estimatedFee)} estimated fees)` : ""}
+                  {coverStripeFees ? ` ${t("includesFees", { fee: formatUsd(estimatedFee) })}` : ""}
                 </p>
                 {guestNote.trim() ? (
                   <p>
-                    <span className="font-semibold">Note:</span> {guestNote.trim()}
+                    <span className="font-semibold">{t("noteDisplayLabel")}</span> {guestNote.trim()}
                   </p>
                 ) : null}
               </div>
@@ -361,13 +361,13 @@ export default function RegistryTab() {
                 onClick={() => setStep(1)}
                 className="mt-4 font-oldforge text-xs uppercase tracking-wider text-primary underline underline-offset-2"
               >
-                Edit details
+                {t("editDetails")}
               </button>
             </div>
 
             <div className="rounded-xl border border-primary/20 bg-white/50 p-5 md:p-6 space-y-5">
               <div>
-                <p className="font-oldforge uppercase text-xs tracking-wider text-primary mb-2">Payment method</p>
+                <p className="font-oldforge uppercase text-xs tracking-wider text-primary mb-2">{t("paymentMethod")}</p>
                 <div className="flex flex-wrap gap-2">
                   <button
                     type="button"
@@ -379,7 +379,7 @@ export default function RegistryTab() {
                     }`}
                     aria-pressed={method === "venmo"}
                   >
-                    Venmo
+                    {t("venmo")}
                   </button>
                   <button
                     type="button"
@@ -391,7 +391,7 @@ export default function RegistryTab() {
                     }`}
                     aria-pressed={method === "card"}
                   >
-                    Card (Stripe)
+                    {t("cardStripe")}
                   </button>
                 </div>
               </div>
@@ -407,10 +407,10 @@ export default function RegistryTab() {
                   />
                   <label htmlFor="cover-stripe-fees" className="cursor-pointer">
                     <span className="font-oldforge uppercase text-xs tracking-wider text-primary">
-                      Cover Stripe fees
+                      {t("coverStripeFees")}
                     </span>
                     <p className="font-oldforge text-stone-600 text-xs mt-1 leading-relaxed">
-                      We add an estimated amount so processing fees are covered.
+                      {t("coverStripeFeesDesc")}
                     </p>
                   </label>
                 </div>
@@ -428,7 +428,7 @@ export default function RegistryTab() {
                           onClick={() => openVenmo(link)}
                           className="font-oldforge uppercase text-center inline-flex items-center justify-center border-2 border-primary bg-primary text-secondary px-5 py-3 rounded-md hover:brightness-110 transition-[filter] disabled:opacity-50 disabled:pointer-events-none"
                         >
-                          {venmoSaving ? "Saving…" : `${link.label} — ${amountIsValid ? formatUsd(baseAmount) : "—"}`}
+                          {venmoSaving ? t("saving") : `${link.label} — ${amountIsValid ? formatUsd(baseAmount) : "—"}`}
                         </button>
                       ))}
                     </div>
@@ -441,7 +441,7 @@ export default function RegistryTab() {
                     </p>
                   ) : (
                     <p className="font-oldforge text-stone-600 text-base leading-relaxed">
-                      Venmo details will appear here soon.
+                      {t("venmoNotReady")}
                     </p>
                   )}
                   {venmoError ? (
@@ -459,10 +459,10 @@ export default function RegistryTab() {
                     className="font-oldforge uppercase border-2 border-primary text-primary bg-transparent px-5 py-3 rounded-md hover:bg-primary/10 transition-colors disabled:opacity-50 disabled:pointer-events-none"
                   >
                     {stripeLoading
-                      ? "Opening checkout…"
+                      ? t("openingCheckout")
                       : amountIsValid
-                        ? `Pay ${formatUsd(coverStripeFees ? estimatedCharge : baseAmount)} with card`
-                        : "Pay with card"}
+                        ? t("payAmountWithCard", { amount: formatUsd(coverStripeFees ? estimatedCharge : baseAmount) })
+                        : t("payWithCard")}
                   </button>
                   {stripeError ? (
                     <p className="font-oldforge text-sm text-red-800 mt-3 max-w-prose" role="alert">

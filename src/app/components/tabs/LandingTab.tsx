@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
+import { useTranslations } from 'next-intl';
 import Divider from '../Divider';
 
 interface LandingTabProps {
@@ -18,6 +19,7 @@ export default function LandingTab({
   mobileIntroComplete,
   onMobileIntroComplete,
 }: LandingTabProps) {
+  const t = useTranslations('Landing');
   const [opened, setOpened] = useState(false);
   /** Mobile-only: 1 combined intro → 2 details → 3 full summary */
   const [mobileStep, setMobileStep] = useState(1);
@@ -101,10 +103,10 @@ export default function LandingTab({
               setOpened(true);
               setMobileStep(1);
             }}
-            aria-label="Open the invitation"
+            aria-label={t('openInvitation')}
             aria-expanded={opened}
           >
-            Open
+            {t('open')}
           </button>
 
           <div
@@ -123,7 +125,7 @@ export default function LandingTab({
                   {mobileStep === 1 && (
                     <>
                       <p className="font-oldforge text-2xl sm:text-3xl mb-2 text-primary leading-snug">
-                        DEAREST FAMILY &amp; FRIENDS
+                        {t('dearestFamilyFriends')}
                       </p>
                       <div className="grid grid-cols-[auto_auto_auto] space-y-2 grid-rows-3 gap-y-0 mb-2 w-max max-w-full mx-auto items-end">
                         <h1 className="col-start-1 row-start-1 font-parochus-original text-6xl sm:text-7xl text-primary text-center leading-[0.85] -mb-[0.15em]">
@@ -144,10 +146,10 @@ export default function LandingTab({
                       </div>
                       <div className="space-y-2">
                         <p className="font-oldforge text-xl sm:text-2xl text-primary leading-snug">
-                          REQUEST YOUR PRESENCE
+                          {t('requestPresence')}
                         </p>
                         <p className="font-oldforge text-xl sm:text-2xl text-primary leading-snug">
-                          TO CELEBRATE THEIR MARRIAGE
+                          {t('celebrateMarriage')}
                         </p>
                       </div>
                     </>
@@ -157,10 +159,10 @@ export default function LandingTab({
                     <div className="w-full space-y-8 py-1">
                       <div className="space-y-2">
                         <p className="font-oldforge text-2xl tracking-[0.25em] text-primary uppercase">
-                          When
+                          {t('when')}
                         </p>
                         <h2 className="font-parochus-original text-5xl text-primary leading-tight">
-                          3. October 2026
+                          {t('weddingDate')}
                         </h2>
                       </div>
                       <div className="space-y-3">
@@ -168,13 +170,13 @@ export default function LandingTab({
                       </div>
                       <div className="space-y-3">
                         <p className="font-oldforge text-2xl tracking-[0.25em] text-primary uppercase">
-                          Where
+                          {t('where')}
                         </p>
                         <h3 className="font-parochus-original text-5xl text-primary leading-snug">
-                          Château de Lacoste
+                          {t('venueName')}
                         </h3>
                         <p className="font-oldforge text-xl sm:text-2xl text-stone-800 font-medium tracking-wide">
-                          Castelnaud-la-Chapelle, France
+                          {t('venueLocation')}
                         </p>
                       </div>
                     </div>
@@ -182,7 +184,7 @@ export default function LandingTab({
 
                   {mobileStep === MOBILE_STEP_LAST && (
                     <div className="w-full space-y-3 text-balance">
-                      <p className="font-oldforge text-xl text-primary">DEAREST FAMILY &amp; FRIENDS</p>
+                      <p className="font-oldforge text-xl text-primary">{t('dearestFamilyFriends')}</p>
                       <div className="grid grid-cols-[auto_auto_auto] grid-rows-3 gap-y-0 w-max max-w-full mx-auto items-end justify-center">
                         <h2 className="col-start-1 row-start-1 font-parochus-original text-5xl sm:text-6xl text-primary text-right leading-[0.85] -mb-[0.15em]">
                           Macy
@@ -201,15 +203,15 @@ export default function LandingTab({
                         </h2>
                       </div>
                       <p className="font-oldforge text-base text-xl text-primary pt-1">
-                        REQUEST YOUR PRESENCE TO CELEBRATE THEIR MARRIAGE
+                        {t('requestPresenceFull')}
                       </p>
                       <div className="space-y-2">
                         <Divider src="/images/dividers/divider1.png" className="my-2 w-[40%] mx-auto" />
                       </div>
-                      <p className="font-oldforge text-xl text-stone-800">3. October 2026</p>
+                      <p className="font-oldforge text-xl text-stone-800">{t('weddingDate')}</p>
                       {/* <p className="font-oldforge text-base text-stone-800">3. October 2026 · 0:00 in the evening</p> */}
                       <p className="font-oldforge text-lg text-stone-700">
-                        Château de Lacoste · Castelnaud-la-Chapelle, France
+                        {t('venueShort')}
                       </p>
                     </div>
                   )}
@@ -222,7 +224,7 @@ export default function LandingTab({
                       className="font-oldforge uppercase inline-block border-2 border-primary text-primary hover:bg-primary hover:text-white transition-colors duration-300 px-8 py-3 rounded-md font-sans text-lg w-full max-w-xs"
                       onClick={() => setMobileStep((s) => Math.min(MOBILE_STEP_LAST, s + 1))}
                     >
-                      Details
+                      {t('details')}
                     </button>
                   ) : mobileStep === 2 ? (
                     <button
@@ -230,7 +232,7 @@ export default function LandingTab({
                       className="font-oldforge uppercase inline-block border-2 border-primary text-primary hover:bg-primary hover:text-white transition-colors duration-300 px-8 py-3 rounded-md font-sans text-lg w-full max-w-xs"
                       onClick={() => setMobileStep((s) => Math.min(MOBILE_STEP_LAST, s + 1))}
                     >
-                      Summary
+                      {t('summary')}
                     </button>
                   ) : (
                     <button
@@ -238,7 +240,7 @@ export default function LandingTab({
                       onClick={onGoToRsvp}
                       className="font-oldforge uppercase inline-block border-2 border-primary text-primary hover:bg-primary hover:text-white transition-colors duration-300 px-8 py-3 rounded-md font-sans text-lg w-full max-w-xs"
                     >
-                      Save Your Seat
+                      {t('saveYourSeat')}
                     </button>
                   )}
                 </div>
@@ -247,7 +249,7 @@ export default function LandingTab({
               {/* Desktop: original full content */}
               <div className="hidden md:block">
                 <p className="font-oldforge text-lg md:text-lg lg:text-xl mb-0.5 text-primary">
-                  DEAREST FAMILY & FRIENDS
+                  {t('dearestFamilyFriends')}
                 </p>
                 <div className="grid grid-cols-[auto_auto_auto] grid-rows-3 gap-y-0 mb-3 md:mb-4 w-max max-w-full mx-auto items-end">
                   <h1 className="col-start-1 row-start-1 font-parochus-original text-5xl md:text-6xl lg:text-7xl text-primary text-right leading-[0.85] -mb-[0.15em]">
@@ -267,23 +269,23 @@ export default function LandingTab({
                   </h1>
                 </div>
                 <p className="font-oldforge text-lg md:text-lg lg:text-xl mb-0.5 text-primary">
-                  REQUEST YOUR PRESENCE
+                  {t('requestPresence')}
                 </p>
                 <p className="font-oldforge text-lg md:text-lg lg:text-xl mb-0.5 text-primary">
-                  TO CELEBRATE THEIR MARRIAGE
+                  {t('celebrateMarriage')}
                 </p>
                 <Divider
                   src="/images/dividers/divider1.png"
                   className="my-4 md:my-5 w-[30%] mx-auto"
                 />
                 <p className="font-oldforge text-base md:text-lg lg:text-xl mb-0.5 text-stone-800">
-                  3. October 2026
+                  {t('weddingDate')}
                 </p>
                 <p className="font-oldforge text-sm md:text-base mt-1 text-stone-700">
-                  Château de Lacoste
+                  {t('venueName')}
                 </p>
                 <p className="font-oldforge text-sm md:text-base mt-0.5 text-stone-700">
-                  Castelnaud-la-Chapelle, France
+                  {t('venueLocation')}
                 </p>
                 <div className="mt-6 md:mt-8">
                   <button
@@ -291,7 +293,7 @@ export default function LandingTab({
                     onClick={onGoToRsvp}
                     className="font-oldforge uppercase inline-block border-2 border-primary text-primary hover:bg-primary hover:text-white transition-colors duration-300 px-6 py-2.5 md:px-8 md:py-3 rounded-md font-sans text-lg md:text-xl"
                   >
-                    Save Your Seat
+                    {t('saveYourSeat')}
                   </button>
                 </div>
               </div>

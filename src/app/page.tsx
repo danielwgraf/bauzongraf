@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import type { InviteParty, MemberRSVP, TabId } from './types';
 import { TABS } from './types';
 import {
@@ -16,19 +17,13 @@ import {
 } from './components/tabs';
 import { NavBar } from './components/nav';
 
-const TAB_LABELS: Record<TabId, string> = {
-  faq: 'FAQ',
-  landing: 'Home',
-  venue: 'Venue',
-  schedule: 'Schedule',
-  'things-to-do': 'Things to Do',
-  travel: 'Travel',
-  registry: 'Registry',
-  rsvp: 'RSVP',
-};
-
 function HomeContent() {
   const searchParams = useSearchParams();
+  const tTabs = useTranslations('Tabs');
+  const tErrors = useTranslations('Errors');
+
+  const tabLabels = Object.fromEntries(TABS.map(tab => [tab, tTabs(tab)])) as Record<TabId, string>;
+
   const [activeTab, setActiveTab] = useState<TabId>('landing');
   const [lastName, setLastName] = useState('');
   const [party, setParty] = useState<InviteParty | null>(null);
@@ -40,7 +35,6 @@ function HomeContent() {
   const [error, setError] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const [isUpdate, setIsUpdate] = useState(false);
-  /** Mobile landing: after user finishes the step flow once, skip to summary when returning Home (session state, no localStorage) */
   const [landingMobileIntroComplete, setLandingMobileIntroComplete] = useState(false);
 
   const markLandingMobileIntroComplete = useCallback(() => {
@@ -119,7 +113,7 @@ function HomeContent() {
       const data = await response.json();
 
       if (!response.ok) {
-        setError(data.error || 'No matching invite found. Please check your last name and try again.');
+        setError(data.error || tErrors('noInvite'));
       } else {
         if (data.multiple && data.parties) {
           setMatchingParties(data.parties);
@@ -131,7 +125,7 @@ function HomeContent() {
         }
       }
     } catch {
-      setError('An error occurred. Please try again.');
+      setError(tErrors('generic'));
     } finally {
       setLoading(false);
     }
@@ -158,17 +152,17 @@ function HomeContent() {
     if (!party) return;
     const attendingMembers = party.members.filter((m) => memberRsvps[m.id]?.isAttending);
     if (attendingMembers.length > 0 && !accommodation) {
-      setError('Please select your accommodation preference.');
+      setError(tErrors('accommodationRequired'));
       return;
     }
     for (const member of attendingMembers) {
       const rsvp = memberRsvps[member.id];
       if (!rsvp?.entreeChoice?.trim()) {
-        setError(`${member.firstName} ${member.lastName}: please choose an entrée.`);
+        setError(tErrors('chooseEntree', { name: `${member.firstName} ${member.lastName}` }));
         return;
       }
       if (!rsvp?.dessertChoice?.trim()) {
-        setError(`${member.firstName} ${member.lastName}: please choose a dessert.`);
+        setError(tErrors('chooseDessert', { name: `${member.firstName} ${member.lastName}` }));
         return;
       }
     }
@@ -197,13 +191,13 @@ function HomeContent() {
       const data = await response.json();
 
       if (!response.ok) {
-        setError(data.error || 'Failed to submit RSVP. Please try again.');
+        setError(data.error || tErrors('submitFailed'));
       } else {
         setIsUpdate(data.isUpdate || false);
         setSubmitted(true);
       }
     } catch {
-      setError('An error occurred. Please try again.');
+      setError(tErrors('generic'));
     } finally {
       setLoading(false);
     }
@@ -223,7 +217,7 @@ function HomeContent() {
 
   return (
     <>
-      <NavBar activeTab={activeTab} tabs={TABS} goToTab={goToTab} tabLabels={TAB_LABELS} />
+      <NavBar activeTab={activeTab} tabs={TABS} goToTab={goToTab} tabLabels={tabLabels} />
 
       {activeTab === 'landing' && (
         <LandingTab
